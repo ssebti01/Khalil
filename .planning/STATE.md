@@ -1,7 +1,7 @@
 # Project State
 
 **Project:** Head Soccer Feature Update
-**Last activity:** 2026-04-14 - Completed quick task 260414-tp8: phase 2
+**Last activity:** 2026-04-14 - Completed quick task 260414-tuv: phase 3 (pause menu)
 
 ## Phase Progress
 
@@ -24,3 +24,4 @@ None.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260414-tp8 | phase 2 — head visuals (128px + squash-stretch wobble) | 2026-04-14 | c69bab2 | [260414-tp8-phase-2](.planning/quick/260414-tp8-phase-2/) |
+| 260414-tuv | phase 3 — pause menu (ESC overlay, physics freeze, Resume/Restart/Menu) | 2026-04-14 | b7ea59b | [260414-tuv-phase-3](.planning/quick/260414-tuv-phase-3/) |
