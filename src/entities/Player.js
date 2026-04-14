@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { PLAYER, PHYSICS, GAME_WIDTH, GAME_HEIGHT, ABILITY_COOLDOWN, ABILITIES } from '../config/constants.js';
+import { PLAYER, PHYSICS, GAME_WIDTH, GAME_HEIGHT, ABILITY_COOLDOWN, ABILITIES, BALL } from '../config/constants.js';
 
 const HEAD_DISPLAY_SIZE = 128;
 
@@ -129,27 +129,37 @@ export class Player {
     this.abilityCooldown = time + ABILITY_COOLDOWN;
     const id = this.char.id;
 
-    if (id === 'fire') {
+    if (id === 'khalil') {
+      // fire — horizontal+upward impulse toward opponent's goal
       const dx = this.side === 'left' ? 1 : -1;
       ball.applyImpulse({ x: dx * ABILITIES.fire.impulseX, y: ABILITIES.fire.impulseY });
       this._emitParticles(0xff6600);
-    } else if (id === 'ice') {
+    } else if (id === 'beboush') {
+      // ice — freeze opponent (resolved by GameScene handler)
       this.scene.events.emit('player-ability', { type: 'freeze', source: this });
       this._emitParticles(0x88ddff);
-    } else if (id === 'thunder') {
+    } else if (id === 'lilya') {
+      // thunder — horizontal dash toward ball
       const dx = ball.x - this.x;
       this.sprite.setVelocityX(Math.sign(dx) * ABILITIES.thunder.dashSpeed);
       this._emitParticles(0xffff44);
-    } else if (id === 'ninja') {
+    } else if (id === 'fafa') {
+      // ninja — teleport to ball, head-above (offsetY = -60), velocity zeroed
       this.sprite.setPosition(
         Phaser.Math.Clamp(ball.x, 80, GAME_WIDTH - 80),
         ball.y + ABILITIES.ninja.teleportOffsetY
       );
       this.sprite.setVelocity(0, 0);
       this._emitParticles(0xcc44ff);
-    } else if (id === 'tiny') {
+    } else if (id === 'sara') {
+      // tiny — super-jump up, then delayed ball slam-down (guard against mid-flight reset)
       this.sprite.setVelocityY(PLAYER.jumpForce * 1.8);
       this.scene.time.delayedCall(ABILITIES.tiny.ballLiftDelay, () => {
+        // Guard: if ball was reset to center during the 350ms window, skip impulse
+        const nearCenter =
+          Math.abs(ball.x - BALL.startX) < 80 &&
+          Math.abs(ball.y - BALL.startY) < 80;
+        if (nearCenter) return;
         this.sprite.setVelocityY(12);
         ball.applyImpulse({ x: 0, y: ABILITIES.tiny.ballLiftImpulse });
       });

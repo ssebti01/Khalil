@@ -4,7 +4,7 @@ import { Player } from '../entities/Player.js';
 import { CPUPlayer } from '../ai/CPUPlayer.js';
 import { getCharacter } from '../config/characters.js';
 import {
-  GAME_WIDTH, GAME_HEIGHT, MATCH, PLAYER, GOAL, PHYSICS,
+  GAME_WIDTH, GAME_HEIGHT, MATCH, PLAYER, GOAL, PHYSICS, ABILITIES,
 } from '../config/constants.js';
 import { getMap, MAPS } from '../config/maps.js';
 import { drawBackground, createObstacles } from '../systems/MapLoader.js';
@@ -15,8 +15,8 @@ export class GameScene extends Phaser.Scene {
   constructor() { super({ key: 'GameScene' }); }
 
   init(data) {
-    this.p1CharId = data.p1CharId ?? 'fire';
-    this.p2CharId = data.p2CharId ?? 'ice';
+    this.p1CharId = data.p1CharId ?? 'khalil';
+    this.p2CharId = data.p2CharId ?? 'beboush';
     this.vsMode = data.vsMode ?? '2p';
     this.score = [0, 0];
     this.matchTime = MATCH.duration;
@@ -82,7 +82,7 @@ export class GameScene extends Phaser.Scene {
     this.events.on('player-ability', ({ type, source }) => {
       if (type === 'freeze') {
         const target = source === this.p1 ? this.p2 : this.p1;
-        target.freeze(2000);
+        target.freeze(ABILITIES.ice.freezeDuration);
       }
     });
 
