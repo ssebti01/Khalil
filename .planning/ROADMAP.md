@@ -109,7 +109,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 07-01: Implement Chicago and Houston maps in maps.js; add wind-force system for Chicago
+- [x] 07-01: Implement Chicago and Houston maps in maps.js; add wind-force system for Chicago
 - [ ] 07-02: Integration smoke test all 7 maps; fix any regressions; polish map selector UI
 
 ## Progress
@@ -122,14 +122,14 @@ Plans:
 | 4. Map System | 2/2 | Complete   | 2026-04-14 |
 | 5. Morocco Maps | 1/1 | Complete   | 2026-04-14 |
 | 6. Asia & NYC Maps | 1/1 | Complete   | 2026-04-14 |
-| 7. US Maps & Polish | 0/2 | Not started | - |
+| 7. US Maps & Polish | 1/2 | In Progress|  |
 
 ### Phase 8: Ability System Polish
 
 **Goal:** Audit and fix power-up logic (fire/ice/thunder/ninja/tiny), redesign in-game ability HUD with icons, cooldown bars, and activation visual feedback.
 **Requirements**: TBD
 **Depends on:** Phase 5
-**Plans:** 1/1 plans complete
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] TBD (run /gsd:plan-phase 8 to break down)
