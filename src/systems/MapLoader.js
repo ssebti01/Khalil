@@ -64,6 +64,11 @@ export function drawBackground(scene, mapConfig) {
   g.lineBetween(GAME_WIDTH - 60, GAME_HEIGHT - 80 - GOAL.height, GAME_WIDTH - 60, GAME_HEIGHT - 80); // right post
   g.lineBetween(60, GAME_HEIGHT - 80 - GOAL.height, 0, GAME_HEIGHT - 80 - GOAL.height);              // left crossbar
   g.lineBetween(GAME_WIDTH - 60, GAME_HEIGHT - 80 - GOAL.height, GAME_WIDTH, GAME_HEIGHT - 80 - GOAL.height); // right crossbar
+
+  // Optional per-map decoration (minarets, trees, etc.)
+  if (mapConfig.decoration) {
+    mapConfig.decoration(scene, g);
+  }
 }
 
 /**
