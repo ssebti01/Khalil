@@ -34,15 +34,29 @@ describe('maps config', () => {
       expect(rabat.background.pitchColor).toBe(0x8b4513);
     });
 
-    it('all obstacles have label "obstacle"', () => {
-      rabat.obstacles.forEach(obs => expect(obs.label).toBe('obstacle'));
+    it('has expected floor physics', () => {
+      expect(rabat.floorFriction).toBe(0.05);
+      expect(rabat.floorRestitution).toBe(0.2);
+    });
+
+    it('windForce is null and specialZones is empty', () => {
+      expect(rabat.windForce).toBeNull();
+      expect(rabat.specialZones).toEqual([]);
+    });
+
+    it('all obstacles have label "obstacle" and a visual object', () => {
+      rabat.obstacles.forEach(obs => {
+        expect(obs.label).toBe('obstacle');
+        expect(obs.visual).toBeDefined();
+        expect(typeof obs.visual.color).toBe('number');
+      });
     });
 
     it('has a decoration function', () => {
       expect(typeof rabat.decoration).toBe('function');
     });
 
-    it('decoration function calls fillStyle and fillRect on graphics object', () => {
+    it('decoration draws exactly 34 fillRects: 6 minaret + 28 crenellations', () => {
       const calls = [];
       const g = {
         fillStyle: (...args) => calls.push(['fillStyle', ...args]),
@@ -50,7 +64,8 @@ describe('maps config', () => {
       };
       rabat.decoration(null, g);
       expect(calls.some(c => c[0] === 'fillStyle')).toBe(true);
-      expect(calls.filter(c => c[0] === 'fillRect').length).toBeGreaterThan(0);
+      // 3 rects per minaret × 2 minarets = 6, plus 28 crenellation rects
+      expect(calls.filter(c => c[0] === 'fillRect').length).toBe(34);
     });
   });
 
@@ -65,13 +80,26 @@ describe('maps config', () => {
       expect(bouskoura.floorFriction).toBe(0.001);
     });
 
+    it('windForce is null and specialZones is empty', () => {
+      expect(bouskoura.windForce).toBeNull();
+      expect(bouskoura.specialZones).toEqual([]);
+    });
+
     it('fallen log has restitution 0.5 (bouncy)', () => {
       const log = bouskoura.obstacles.find(o => o.w === 180);
       expect(log).toBeDefined();
       expect(log.restitution).toBe(0.5);
     });
 
-    it('has a decoration function that draws tree trunks and canopies', () => {
+    it('all obstacles have label "obstacle" and a visual object', () => {
+      bouskoura.obstacles.forEach(obs => {
+        expect(obs.label).toBe('obstacle');
+        expect(obs.visual).toBeDefined();
+        expect(typeof obs.visual.color).toBe('number');
+      });
+    });
+
+    it('decoration draws exactly 4 tree trunks (fillRect) and 4 canopies (fillCircle)', () => {
       const calls = [];
       const g = {
         fillStyle: (...args) => calls.push(['fillStyle', ...args]),
@@ -79,8 +107,8 @@ describe('maps config', () => {
         fillCircle: (...args) => calls.push(['fillCircle', ...args]),
       };
       bouskoura.decoration(null, g);
-      expect(calls.filter(c => c[0] === 'fillRect').length).toBeGreaterThanOrEqual(4);
-      expect(calls.filter(c => c[0] === 'fillCircle').length).toBeGreaterThanOrEqual(4);
+      expect(calls.filter(c => c[0] === 'fillRect').length).toBe(4);
+      expect(calls.filter(c => c[0] === 'fillCircle').length).toBe(4);
     });
   });
 

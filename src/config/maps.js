@@ -1,4 +1,4 @@
-import { GAME_WIDTH, GAME_HEIGHT, GOAL, PHYSICS } from './constants.js';
+import { GAME_WIDTH, GAME_HEIGHT, GOAL, PHYSICS, PLAYER } from './constants.js';
 
 export const MAPS = [
   {
@@ -38,21 +38,22 @@ export const MAPS = [
       markingColor: 0xaa6633,
     },
     decoration: (scene, g) => {
-      // Minaret silhouettes in crowd zone (y range: GAME_HEIGHT-80-h to GAME_HEIGHT-80)
+      // Minaret silhouettes in crowd zone — PLAYER.groundY is the floor Y (GAME_HEIGHT - 80)
       // Two minarets: left side and right side
       g.fillStyle(0x0d0500, 1);
       // Left minaret: tall rectangle with small rectangular cap
-      g.fillRect(180, GAME_HEIGHT - 80 - 120, 20, 120);   // shaft
-      g.fillRect(175, GAME_HEIGHT - 80 - 130, 30, 14);    // top band
-      g.fillRect(185, GAME_HEIGHT - 80 - 145, 10, 20);    // spire
+      g.fillRect(180, PLAYER.groundY - 120, 20, 120);   // shaft
+      g.fillRect(175, PLAYER.groundY - 130, 30, 14);    // top band
+      g.fillRect(185, PLAYER.groundY - 145, 10, 20);    // spire
 
       // Right minaret: mirror
-      g.fillRect(GAME_WIDTH - 200, GAME_HEIGHT - 80 - 120, 20, 120);
-      g.fillRect(GAME_WIDTH - 205, GAME_HEIGHT - 80 - 130, 30, 14);
-      g.fillRect(GAME_WIDTH - 195, GAME_HEIGHT - 80 - 145, 10, 20);
+      g.fillRect(GAME_WIDTH - 200, PLAYER.groundY - 120, 20, 120);
+      g.fillRect(GAME_WIDTH - 205, PLAYER.groundY - 130, 30, 14);
+      g.fillRect(GAME_WIDTH - 195, PLAYER.groundY - 145, 10, 20);
 
-      // Rooftop wall silhouettes (crenellated low wall across bottom of crowd zone)
-      const wallY = GAME_HEIGHT - 80 - 12;
+      // Rooftop wall: crenellated low wall across bottom of crowd zone
+      // 28 = floor((GAME_WIDTH - 80) / 40) steps of 40px starting at x=80
+      const wallY = PLAYER.groundY - 12;
       for (let i = 0; i < 28; i++) {
         const bx = 80 + i * 40;
         const bh = i % 2 === 0 ? 20 : 12;
@@ -64,7 +65,7 @@ export const MAPS = [
       {
         type: 'box',
         x: 640,
-        y: 590,           // center y: floor is 640, this sits with top at y=560
+        y: 590,           // center y=590, h=60 → bottom=620 (20px above floor at y=640)
         w: 80,
         h: 60,
         restitution: 0.4,
@@ -121,12 +122,12 @@ export const MAPS = [
     decoration: (scene, g) => {
       g.fillStyle(0x050e02, 1);
       // Tree silhouettes: trunk (rectangle) + canopy (circle)
-      // Left tree cluster
+      // PLAYER.groundY is the floor Y (GAME_HEIGHT - 80)
       const trees = [
-        { tx: 320, ty: GAME_HEIGHT - 80, trunkH: 200, trunkW: 18, canopyR: 55 },
-        { tx: 390, ty: GAME_HEIGHT - 80, trunkH: 160, trunkW: 14, canopyR: 42 },
-        { tx: 950, ty: GAME_HEIGHT - 80, trunkH: 200, trunkW: 18, canopyR: 55 },
-        { tx: 1020, ty: GAME_HEIGHT - 80, trunkH: 160, trunkW: 14, canopyR: 42 },
+        { tx: 320, ty: PLAYER.groundY, trunkH: 200, trunkW: 18, canopyR: 55 },
+        { tx: 390, ty: PLAYER.groundY, trunkH: 160, trunkW: 14, canopyR: 42 },
+        { tx: 950, ty: PLAYER.groundY, trunkH: 200, trunkW: 18, canopyR: 55 },
+        { tx: 1020, ty: PLAYER.groundY, trunkH: 160, trunkW: 14, canopyR: 42 },
       ];
       for (const t of trees) {
         // Trunk
@@ -140,7 +141,7 @@ export const MAPS = [
       {
         type: 'box',
         x: 360,
-        y: 520,           // tall narrow pillar: top at y=480, bottom at y=560
+        y: 520,           // center y=520, h=80 → top=480, bottom=560 (80px above floor at y=640)
         w: 28,
         h: 80,
         restitution: 0.3,
@@ -164,7 +165,7 @@ export const MAPS = [
       {
         type: 'box',
         x: 640,
-        y: 615,           // sits on floor, top at y=600
+        y: 615,           // center y=615, h=30 → top=600, bottom=630 (10px above floor at y=640)
         w: 180,
         h: 30,
         restitution: 0.5, // bouncy

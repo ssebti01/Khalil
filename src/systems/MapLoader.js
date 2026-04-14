@@ -66,6 +66,8 @@ export function drawBackground(scene, mapConfig) {
   g.lineBetween(GAME_WIDTH - 60, GAME_HEIGHT - 80 - GOAL.height, GAME_WIDTH, GAME_HEIGHT - 80 - GOAL.height); // right crossbar
 
   // Optional per-map decoration (minarets, trees, etc.)
+  // Note: decoration shares the same graphics object `g` as the base background,
+  // so it always renders on top of pitch/crowd but cannot control its own layer order.
   if (mapConfig.decoration) {
     mapConfig.decoration(scene, g);
   }
