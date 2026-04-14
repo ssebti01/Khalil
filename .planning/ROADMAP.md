@@ -11,7 +11,7 @@ Polish and expand the Head Soccer Phaser 3 game with bug fixes, visual improveme
 - [ ] **Phase 3: Pause Menu** - ESC pause with resume/restart/home options
 - [x] **Phase 4: Map System** - Data-driven map architecture with map selector UI (completed 2026-04-14)
 - [x] **Phase 5: Morocco Maps** - Rabat and Bouskoura Forest arenas (completed 2026-04-14)
-- [ ] **Phase 6: Asia & NYC Maps** - Shanghai and New York City arenas
+- [x] **Phase 6: Asia & NYC Maps** - Shanghai and New York City arenas (completed 2026-04-14)
 - [ ] **Phase 7: US Maps & Polish** - Chicago and Houston arenas, full integration pass
 
 ## Phase Details
@@ -95,7 +95,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 06-01: Implement Shanghai and NYC maps in maps.js with procedural backgrounds and obstacle/special-zone definitions
+- [x] 06-01: Implement Shanghai and NYC maps in maps.js with procedural backgrounds and obstacle/special-zone definitions
 
 ### Phase 7: US Maps & Polish
 **Goal**: Implement Chicago and Houston arenas, add a wind-force mechanic (Chicago), a bouncy floor (Houston), and do a final integration pass across all 7 maps.
@@ -121,5 +121,15 @@ Plans:
 | 3. Pause Menu | 0/1 | Not started | - |
 | 4. Map System | 2/2 | Complete   | 2026-04-14 |
 | 5. Morocco Maps | 1/1 | Complete   | 2026-04-14 |
-| 6. Asia & NYC Maps | 0/1 | Not started | - |
+| 6. Asia & NYC Maps | 1/1 | Complete   | 2026-04-14 |
 | 7. US Maps & Polish | 0/2 | Not started | - |
+
+### Phase 8: Ability System Polish
+
+**Goal:** Audit and fix power-up logic (fire/ice/thunder/ninja/tiny), redesign in-game ability HUD with icons, cooldown bars, and activation visual feedback.
+**Requirements**: TBD
+**Depends on:** Phase 5
+**Plans:** 1/1 plans complete
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 8 to break down)
