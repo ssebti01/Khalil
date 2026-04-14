@@ -2,17 +2,19 @@ import { describe, it, expect } from 'vitest';
 import { MAPS, getMap, getMaps } from '../src/config/maps.js';
 
 describe('maps config', () => {
-  it('MAPS array has exactly 5 entries in the correct order', () => {
-    expect(MAPS).toHaveLength(5);
+  it('MAPS array has exactly 7 entries in the correct order', () => {
+    expect(MAPS).toHaveLength(7);
     expect(MAPS[0].id).toBe('stadium');
     expect(MAPS[1].id).toBe('rabat');
     expect(MAPS[2].id).toBe('bouskoura');
     expect(MAPS[3].id).toBe('shanghai');
-    expect(MAPS[4].id).toBe('nyc');
+    expect(MAPS[4].id).toBe('chicago');
+    expect(MAPS[5].id).toBe('houston');
+    expect(MAPS[6].id).toBe('nyc');
   });
 
-  it('getMaps() returns all 5 maps', () => {
-    expect(getMaps()).toHaveLength(5);
+  it('getMaps() returns all 7 maps', () => {
+    expect(getMaps()).toHaveLength(7);
   });
 
   it('getMap() retrieves by id', () => {
