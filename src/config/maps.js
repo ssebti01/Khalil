@@ -311,6 +311,275 @@ export const MAPS = [
     ],
     specialZones: [],
   },
+  // ── CHICAGO ──────────────────────────────────────────────────────────────────
+  {
+    id: 'chicago',
+    name: 'Chicago \u2014 Lakefront Park',
+    floorRestitution: 0.2,
+    floorFriction: 0.3,
+    windForce: { x: 3, y: 0, intervalMs: 4000 },
+    background: (scene) => {
+      const bg = scene.add.graphics();
+
+      // Sky: teal to deep blue lake gradient
+      bg.fillGradientStyle(0x001a33, 0x001a33, 0x003366, 0x003366, 1);
+      bg.fillRect(0, 0, 1280, 720);
+
+      // Lake shimmer band near horizon
+      bg.fillStyle(0x004488, 0.35);
+      bg.fillRect(0, 480, 1280, 160);
+
+      // Chicago skyline silhouettes in crowd zone
+      bg.fillStyle(0x001122, 1);
+      const chiBuildings = [
+        [30, 45, 80], [88, 30, 60], [130, 55, 100], [200, 28, 55],
+        [240, 40, 75],
+        // Willis Tower
+        [490, 60, 160],
+        [490, 20, 190],
+        // Right skyline
+        [1000, 40, 75], [1055, 28, 55], [1100, 55, 100],
+        [1170, 30, 60], [1215, 45, 80],
+      ];
+      chiBuildings.forEach(([bx, bw, bh]) => {
+        bg.fillRect(bx, 640 - bh, bw, bh);
+      });
+      // Willis Tower twin antennas
+      bg.fillRect(500, 640 - 190 - 30, 4, 30);
+      bg.fillRect(536, 640 - 190 - 22, 4, 22);
+
+      // Sailboats in crowd zone (simple triangle sails)
+      bg.fillStyle(0xeeeeff, 0.7);
+      // Boat 1 (left)
+      bg.fillTriangle(170, 638, 185, 590, 200, 638);
+      bg.fillRect(178, 630, 26, 4);
+      // Boat 2 (right)
+      bg.fillTriangle(1080, 638, 1095, 595, 1110, 638);
+      bg.fillRect(1088, 630, 26, 4);
+
+      // Green park grass pitch
+      bg.fillStyle(0x2d6a2d, 1);
+      bg.fillRect(0, 640, 1280, 80);
+
+      // Pitch markings (park style — lighter green)
+      bg.lineStyle(1, 0x44aa44, 0.5);
+      bg.lineBetween(640, 640, 640, 720);
+      bg.strokeCircle(640, 640, 55);
+
+      // Goal net backgrounds
+      bg.fillStyle(0x00080f, 0.65);
+      bg.fillRect(0, 450, 60, 190);
+      bg.fillRect(1220, 450, 60, 190);
+
+      // Net grid
+      bg.lineStyle(1, 0x44bbcc, 0.25);
+      for (let r = 0; r < 190; r += 18) {
+        bg.lineBetween(0, 450 + r, 60, 450 + r);
+        bg.lineBetween(1220, 450 + r, 1280, 450 + r);
+      }
+      for (let c = 0; c < 60; c += 18) {
+        bg.lineBetween(c, 450, c, 640);
+        bg.lineBetween(1220 + c, 450, 1220 + c, 640);
+      }
+
+      // Goal posts
+      bg.lineStyle(6, 0xdddddd, 1);
+      bg.lineBetween(60, 450, 60, 640);
+      bg.lineBetween(1220, 450, 1220, 640);
+      bg.lineBetween(0, 450, 60, 450);
+      bg.lineBetween(1220, 450, 1280, 450);
+
+      // Park bench visual (x 530–750, y 590–615)
+      bg.fillStyle(0x8b5e3c, 1);
+      bg.fillRect(530, 595, 220, 12);
+      bg.fillRect(535, 590, 12, 22);
+      bg.fillRect(703, 590, 12, 22);
+      bg.fillRect(530, 590, 220, 6);
+
+      // Lamp post left visual (x=300, y 490–620, thin)
+      bg.fillStyle(0x7a8899, 1);
+      bg.fillRect(296, 490, 8, 130);
+      bg.fillRect(286, 486, 28, 8);
+      bg.fillStyle(0xffffaa, 0.6);
+      bg.fillRect(289, 490, 20, 5);
+
+      // Lamp post right visual (x=980)
+      bg.fillStyle(0x7a8899, 1);
+      bg.fillRect(976, 490, 8, 130);
+      bg.fillRect(966, 486, 28, 8);
+      bg.fillStyle(0xffffaa, 0.6);
+      bg.fillRect(969, 490, 20, 5);
+    },
+    obstacles: [
+      // Park bench — wide low platform
+      {
+        type: 'box',
+        x: 640, y: 602,
+        w: 220, h: 18,
+        angle: 0,
+        restitution: 0.2,
+        friction: 0.5,
+        label: 'bench',
+        visual: { color: 0x8b5e3c, alpha: 0 },
+      },
+      // Left lamp post — thin tall static body
+      {
+        type: 'box',
+        x: 300, y: 555,
+        w: 8, h: 130,
+        angle: 0,
+        restitution: 0.2,
+        friction: 0.5,
+        label: 'lamppost_left',
+        visual: { color: 0x7a8899, alpha: 0 },
+      },
+      // Right lamp post — mirrored
+      {
+        type: 'box',
+        x: 980, y: 555,
+        w: 8, h: 130,
+        angle: 0,
+        restitution: 0.2,
+        friction: 0.5,
+        label: 'lamppost_right',
+        visual: { color: 0x7a8899, alpha: 0 },
+      },
+    ],
+    specialZones: [],
+  },
+
+  // ── HOUSTON ───────────────────────────────────────────────────────────────────
+  {
+    id: 'houston',
+    name: 'Houston \u2014 Rodeo Arena',
+    floorRestitution: 0.45,
+    floorFriction: 0.25,
+    windForce: null,
+    background: (scene) => {
+      const bg = scene.add.graphics();
+
+      // Sky: deep burnt orange Texas sunset
+      bg.fillGradientStyle(0x3d1a00, 0x3d1a00, 0xff6600, 0xff6600, 1);
+      bg.fillRect(0, 0, 1280, 560);
+      bg.fillGradientStyle(0xff6600, 0xff6600, 0xffaa00, 0xffaa00, 1);
+      bg.fillRect(0, 440, 1280, 200);
+
+      // Silhouettes in crowd zone
+      bg.fillStyle(0x1a0800, 1);
+
+      // Oil pump jack (left side, x~160)
+      bg.fillRect(130, 625, 60, 15);
+      bg.fillRect(155, 560, 10, 65);
+      bg.fillRect(145, 558, 40, 6);
+      bg.fillRect(183, 558, 6, 30);
+      bg.fillRect(130, 555, 28, 8);
+
+      // Cactus (center-left, x~380)
+      bg.fillRect(373, 580, 14, 55);
+      bg.fillRect(355, 598, 20, 8);
+      bg.fillRect(340, 592, 8, 20);
+      bg.fillRect(393, 603, 20, 8);
+      bg.fillRect(405, 597, 8, 16);
+
+      // Barn shape (right edge, x~1080)
+      bg.fillRect(1070, 590, 120, 50);
+      bg.fillTriangle(1060, 590, 1130, 555, 1200, 590);
+
+      // Cactus right (x~900)
+      bg.fillRect(893, 585, 14, 50);
+      bg.fillRect(877, 600, 18, 8);
+      bg.fillRect(863, 594, 8, 18);
+      bg.fillRect(911, 605, 18, 8);
+      bg.fillRect(921, 599, 8, 14);
+
+      // Dirt/sand pitch
+      bg.fillStyle(0xc8a060, 1);
+      bg.fillRect(0, 640, 1280, 80);
+
+      // Subtle dirt texture lines
+      bg.lineStyle(1, 0xaa8840, 0.4);
+      bg.lineBetween(640, 640, 640, 720);
+      bg.strokeCircle(640, 640, 55);
+
+      // Goal net backgrounds
+      bg.fillStyle(0x1a0800, 0.6);
+      bg.fillRect(0, 450, 60, 190);
+      bg.fillRect(1220, 450, 60, 190);
+
+      // Net grid
+      bg.lineStyle(1, 0xdd8833, 0.25);
+      for (let r = 0; r < 190; r += 18) {
+        bg.lineBetween(0, 450 + r, 60, 450 + r);
+        bg.lineBetween(1220, 450 + r, 1280, 450 + r);
+      }
+      for (let c = 0; c < 60; c += 18) {
+        bg.lineBetween(c, 450, c, 640);
+        bg.lineBetween(1220 + c, 450, 1220 + c, 640);
+      }
+
+      // Goal posts
+      bg.lineStyle(6, 0xdddddd, 1);
+      bg.lineBetween(60, 450, 60, 640);
+      bg.lineBetween(1220, 450, 1220, 640);
+      bg.lineBetween(0, 450, 60, 450);
+      bg.lineBetween(1220, 450, 1280, 450);
+
+      // Barrel bumper visuals (circles with wood grain rings)
+      bg.fillStyle(0x8b5e20, 1);
+      bg.fillCircle(420, 595, 22);
+      bg.lineStyle(2, 0x6b3e10, 0.8);
+      bg.strokeCircle(420, 595, 16);
+      bg.strokeCircle(420, 595, 8);
+
+      bg.fillStyle(0x8b5e20, 1);
+      bg.fillCircle(860, 595, 22);
+      bg.lineStyle(2, 0x6b3e10, 0.8);
+      bg.strokeCircle(860, 595, 16);
+      bg.strokeCircle(860, 595, 8);
+
+      // Launch ramp visual
+      bg.fillStyle(0x997744, 0.9);
+      bg.fillTriangle(560, 620, 720, 620, 720, 575);
+      bg.fillTriangle(560, 620, 560, 610, 720, 575);
+      bg.lineStyle(2, 0x775522, 0.9);
+      bg.lineBetween(560, 620, 720, 575);
+    },
+    obstacles: [
+      // Barrel bumper left — very bouncy circle
+      {
+        type: 'circle',
+        x: 420, y: 595,
+        r: 22,
+        restitution: 0.8,
+        friction: 0.1,
+        label: 'barrel_left',
+        visual: { color: 0x8b5e20, alpha: 0 },
+      },
+      // Barrel bumper right — mirrored
+      {
+        type: 'circle',
+        x: 860, y: 595,
+        r: 22,
+        restitution: 0.8,
+        friction: 0.1,
+        label: 'barrel_right',
+        visual: { color: 0x8b5e20, alpha: 0 },
+      },
+      // Launch ramp — angled center box that redirects ball upward
+      {
+        type: 'box',
+        x: 640, y: 598,
+        w: 160, h: 12,
+        angle: 8,
+        restitution: 0.4,
+        friction: 0.2,
+        label: 'ramp',
+        visual: { color: 0x997744, alpha: 0 },
+      },
+    ],
+    specialZones: [],
+  },
+
   {
     id: 'nyc',
     name: 'New York City \u2014 Street Court',
