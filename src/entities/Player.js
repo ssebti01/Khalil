@@ -154,6 +154,29 @@ export class Player {
     this.scene.time.delayedCall(500, () => particles.destroy());
   }
 
+  _wobble() {
+    // Prevent stacking tweens — if one is already running, skip
+    if (this._wobbling) return;
+    this._wobbling = true;
+
+    // Capture the sprite's current base scale (set during _create)
+    const base = this.sprite.scaleX; // scaleX === scaleY when no flip involved
+
+    this.scene.tweens.add({
+      targets: this.sprite,
+      scaleX: base * 1.15,   // stretch horizontally
+      scaleY: base * 0.85,   // squash vertically
+      duration: 60,
+      ease: 'Sine.easeOut',
+      yoyo: true,            // bounce back to base automatically
+      onComplete: () => {
+        // Restore exact base scale (yoyo lands close but pin precisely)
+        this.sprite.setScale(base);
+        this._wobbling = false;
+      },
+    });
+  }
+
   freeze(duration) {
     this.frozenUntil = this.scene.time.now + duration;
     this.sprite.setTint(0x88ddff);
