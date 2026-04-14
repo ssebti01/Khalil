@@ -9,7 +9,7 @@ Polish and expand the Head Soccer Phaser 3 game with bug fixes, visual improveme
 - [x] **Phase 1: Bug Fixes** - Fix goal-stop physics and player movement drift
 - [ ] **Phase 2: Head Visuals** - Bigger heads with wobble/spring physics on impact
 - [ ] **Phase 3: Pause Menu** - ESC pause with resume/restart/home options
-- [ ] **Phase 4: Map System** - Data-driven map architecture with map selector UI
+- [x] **Phase 4: Map System** - Data-driven map architecture with map selector UI (completed 2026-04-14)
 - [ ] **Phase 5: Morocco Maps** - Rabat and Bouskoura Forest arenas
 - [ ] **Phase 6: Asia & NYC Maps** - Shanghai and New York City arenas
 - [ ] **Phase 7: US Maps & Polish** - Chicago and Houston arenas, full integration pass
@@ -69,7 +69,7 @@ Plans:
 
 Plans:
 - [x] 04-01: Create `src/config/maps.js` schema + `src/systems/MapLoader.js`; refactor GameScene._drawArena and _createWalls to be data-driven
-- [ ] 04-02: Add map selection UI to MenuScene; wire mapId through GameScene init data
+- [x] 04-02: Add map selection UI to MenuScene; wire mapId through GameScene init data
 
 ### Phase 5: Morocco Maps
 **Goal**: Implement two Morocco-themed arenas (Rabat medina rooftop, Bouskoura Forest clearing) using the Phase 4 map system.
@@ -119,7 +119,7 @@ Plans:
 | 1. Bug Fixes | 2/2 | Complete | 2026-04-14 |
 | 2. Head Visuals | 0/1 | Not started | - |
 | 3. Pause Menu | 0/1 | Not started | - |
-| 4. Map System | 1/2 | In Progress|  |
+| 4. Map System | 2/2 | Complete   | 2026-04-14 |
 | 5. Morocco Maps | 0/1 | Not started | - |
 | 6. Asia & NYC Maps | 0/1 | Not started | - |
 | 7. US Maps & Polish | 0/2 | Not started | - |
