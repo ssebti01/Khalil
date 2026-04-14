@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { PLAYER, PHYSICS, GAME_WIDTH, GAME_HEIGHT, ABILITY_COOLDOWN, ABILITIES } from '../config/constants.js';
 
-const HEAD_DISPLAY_SIZE = PLAYER.headRadius * 2 + 16;
+const HEAD_DISPLAY_SIZE = 128;
 
 export class Player {
   constructor(scene, x, side, characterData, controlScheme) {
