@@ -153,7 +153,7 @@ export class MenuScene extends Phaser.Scene {
   _drawMapSelector() {
     const maps = getMaps();
     const cx = GAME_WIDTH / 2;
-    const cy = 510;
+    const cy = 490;
 
     // Background strip
     const bg = this.add.graphics();
@@ -163,7 +163,7 @@ export class MenuScene extends Phaser.Scene {
     bg.strokeRoundedRect(cx - 200, cy - 28, 400, 56, 10);
 
     // Label above
-    this.add.text(cx, cy - 40, 'MAP', {
+    this.add.text(cx, cy - 42, 'MAP', {
       fontSize: '14px', fontFamily: 'Arial Black, sans-serif',
       color: '#888888',
     }).setOrigin(0.5);
@@ -218,7 +218,7 @@ export class MenuScene extends Phaser.Scene {
   }
 
   _drawStartButton() {
-    const btn = this.add.text(GAME_WIDTH / 2, 570, 'KICK OFF!', {
+    const btn = this.add.text(GAME_WIDTH / 2, 590, 'KICK OFF!', {
       fontSize: '42px',
       fontFamily: 'Arial Black, sans-serif',
       color: '#ffffff',
