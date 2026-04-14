@@ -245,10 +245,12 @@ export class MenuScene extends Phaser.Scene {
   }
 
   _startGame() {
+    const maps = getMaps();
     this.scene.start('GameScene', {
       p1CharId: CHARACTERS[this.p1CharIndex].id,
       p2CharId: CHARACTERS[this.p2CharIndex].id,
       vsMode: this.vsMode,
+      mapId: maps[this.mapIndex].id,
     });
   }
 }
