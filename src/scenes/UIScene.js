@@ -38,35 +38,39 @@ export class UIScene extends Phaser.Scene {
       color: '#cccccc',
     }).setOrigin(0.5);
 
-    // Ability cooldown bars
-    this._buildAbilityBar(0, 30); // P1 bottom-left
-    this._buildAbilityBar(1, GAME_WIDTH - 30); // P2 bottom-right
+    // Ability HUD (top-center, below score bar)
+    this._buildAbilityHUD(0, GAME_WIDTH / 2 - 140); // P1 at x=500
+    this._buildAbilityHUD(1, GAME_WIDTH / 2 + 140); // P2 at x=780
   }
 
-  _buildAbilityBar(playerIndex, x) {
-    const y = 670;
-    const barW = 120;
-    const bg = this.add.graphics();
-    bg.fillStyle(0x000000, 0.5);
-    bg.fillRoundedRect(x - barW / 2, y - 8, barW, 16, 6);
+  _buildAbilityHUD(playerIndex, centerX) {
+    const y = 97; // just below timer at y=80
 
-    const fill = this.add.graphics();
-    if (playerIndex === 0) {
-      this._p1AbilBar = { fill, x: x - barW / 2, y: y - 8, w: barW };
-    } else {
-      this._p2AbilBar = { fill, x: x - barW / 2, y: y - 8, w: barW };
-    }
+    // Glow background (redrawn each frame; initially empty)
+    const glowBg = this.add.graphics().setDepth(9);
 
-    const label = playerIndex === 0 ? 'Q' : 'SHIFT';
-    this.add.text(x, y + 12, `[${label}] Ability`, {
-      fontSize: '11px', fontFamily: 'Arial, sans-serif', color: '#999999',
-    }).setOrigin(0.5);
-  }
+    // Emoji icon — fontFamily omitted so OS handles emoji rendering (RESEARCH Pitfall 3)
+    const icon = this.add.text(centerX, y, '', {
+      fontSize: '36px',
+      fontFamily: 'Arial, sans-serif',
+    }).setOrigin(0.5).setDepth(10);
 
-  _drawAbilBar(bar, ratio, color) {
-    bar.fill.clear();
-    bar.fill.fillStyle(color, 0.85);
-    bar.fill.fillRoundedRect(bar.x, bar.y, bar.w * ratio, 16, 6);
+    // Countdown number (shown when on cooldown, hidden when ready)
+    const countdown = this.add.text(centerX, y + 26, '', {
+      fontSize: '16px',
+      fontFamily: 'Arial Black, sans-serif',
+      color: '#ffffff',
+    }).setOrigin(0.5).setDepth(10);
+
+    const store = {
+      icon,
+      countdown,
+      glowBg,
+      pulseTween: null,  // tween ref (null when not pulsing)
+      wasReady: false,   // edge-trigger flag for pulse lifecycle
+    };
+    if (playerIndex === 0) this._p1AbilHud = store;
+    else                    this._p2AbilHud = store;
   }
 
   update() {
@@ -84,14 +88,14 @@ export class UIScene extends Phaser.Scene {
     this.timerText.setText(`${mins}:${secs.toString().padStart(2, '0')}`);
     if (t <= 15) this.timerText.setColor('#ff4400');
 
-    // Ability cooldown bars
+    // Ability cooldown HUDs
     const now = this.scene.get('GameScene').time.now;
     const p1Ratio = gs.p1 ? gs.p1.getAbilityCooldownRatio(now) : 1;
     const p2Ratio = gs.p2 ? gs.p2.getAbilityCooldownRatio(now) : 1;
     const p1Color = gs.p1 ? gs.p1.char.accentColor : 0x4488ff;
     const p2Color = gs.p2 ? gs.p2.char.accentColor : 0xff4400;
 
-    if (this._p1AbilBar) this._drawAbilBar(this._p1AbilBar, p1Ratio, p1Color);
-    if (this._p2AbilBar) this._drawAbilBar(this._p2AbilBar, p2Ratio, p2Color);
+    // Keep p1Color/p2Color for potential future use; update HUDs if player exists
+    void p1Color; void p2Color;
   }
 }
