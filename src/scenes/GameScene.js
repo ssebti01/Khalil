@@ -18,6 +18,7 @@ export class GameScene extends Phaser.Scene {
     this.matchTime = MATCH.duration;
     this.goalCooldownUntil = 0;
     this.matchOver = false;
+    this.paused = false;
   }
 
   create() {
@@ -41,6 +42,24 @@ export class GameScene extends Phaser.Scene {
 
     const p1Controls = { left: keys.p1Left, right: keys.p1Right, up: keys.p1Up, ability: keys.p1Ability };
     const p2Controls = { left: keys.p2Left, right: keys.p2Right, up: keys.p2Up, ability: keys.p2Ability };
+
+    this.escKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+    this.escKey.on('down', () => {
+      if (this.matchOver) return;
+      if (this.paused) {
+        this.matter.world.resume();
+        this.paused = false;
+        this.scene.stop('PauseScene');
+      } else {
+        this.matter.world.pause();
+        this.paused = true;
+        this.scene.launch('PauseScene', {
+          p1CharId: this.p1CharId,
+          p2CharId: this.p2CharId,
+          vsMode: this.vsMode,
+        });
+      }
+    });
 
     this.p1 = new Player(this, GAME_WIDTH * 0.25, 'left', getCharacter(this.p1CharId), p1Controls);
     this.p2 = new Player(this, GAME_WIDTH * 0.75, 'right', getCharacter(this.p2CharId), p2Controls);
@@ -259,6 +278,7 @@ export class GameScene extends Phaser.Scene {
 
   update(time, delta) {
     if (this.matchOver) return;
+    if (this.paused) return;
 
     this.ball.update(delta);
 
