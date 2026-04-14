@@ -6,6 +6,8 @@ import { getCharacter } from '../config/characters.js';
 import {
   GAME_WIDTH, GAME_HEIGHT, MATCH, PLAYER, GOAL, PHYSICS,
 } from '../config/constants.js';
+import { getMap } from '../config/maps.js';
+import { drawBackground, createObstacles } from '../systems/MapLoader.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super({ key: 'GameScene' }); }
@@ -19,11 +21,13 @@ export class GameScene extends Phaser.Scene {
     this.goalCooldownUntil = 0;
     this.matchOver = false;
     this.paused = false;
+    this.mapId = data.mapId ?? 'stadium';
   }
 
   create() {
-    this._drawArena();
-    this._createWalls();
+    const mapConfig = getMap(this.mapId);
+    drawBackground(this, mapConfig);
+    createObstacles(this, mapConfig);
     this._createGoals();
 
     this.ball = new Ball(this);
@@ -94,94 +98,6 @@ export class GameScene extends Phaser.Scene {
         }
       },
     });
-  }
-
-  _drawArena() {
-    // Sky gradient
-    const bg = this.add.graphics();
-    bg.fillGradientStyle(0x0d1b2a, 0x0d1b2a, 0x1b3a6b, 0x1b3a6b, 1);
-    bg.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-
-    // Crowd silhouettes
-    bg.fillStyle(0x0a1520, 0.8);
-    for (let i = 0; i < 60; i++) {
-      const x = i * 22 + 5;
-      const h = Phaser.Math.Between(30, 60);
-      bg.fillRect(x, GAME_HEIGHT - 80 - h - 8, 16, h);
-    }
-
-    // Pitch
-    bg.fillStyle(0x2d7a3a);
-    bg.fillRect(0, GAME_HEIGHT - 80, GAME_WIDTH, 80);
-
-    // Pitch markings
-    bg.lineStyle(2, 0x3a9a4a, 0.6);
-    bg.strokeRect(80, GAME_HEIGHT - 80, GAME_WIDTH - 160, 80);
-    bg.lineBetween(GAME_WIDTH / 2, GAME_HEIGHT - 80, GAME_WIDTH / 2, GAME_HEIGHT);
-    bg.strokeCircle(GAME_WIDTH / 2, GAME_HEIGHT - 80, 60);
-
-    // Grass stripes
-    for (let i = 0; i < 10; i++) {
-      bg.fillStyle(i % 2 === 0 ? 0x2d7a3a : 0x347a42, 0.5);
-      bg.fillRect(80 + i * ((GAME_WIDTH - 160) / 10), GAME_HEIGHT - 80, (GAME_WIDTH - 160) / 10, 80);
-    }
-
-    // Floor highlight
-    bg.lineStyle(3, 0x3a9a4a);
-    bg.lineBetween(0, GAME_HEIGHT - 80, GAME_WIDTH, GAME_HEIGHT - 80);
-
-    // Net backgrounds
-    bg.fillStyle(0x001a33, 0.5);
-    bg.fillRect(0, GAME_HEIGHT - 80 - GOAL.height, 60, GOAL.height);
-    bg.fillRect(GAME_WIDTH - 60, GAME_HEIGHT - 80 - GOAL.height, 60, GOAL.height);
-
-    // Net grid
-    bg.lineStyle(1, 0xaaccff, 0.3);
-    for (let r = 0; r < GOAL.height; r += 18) {
-      bg.lineBetween(0, GAME_HEIGHT - 80 - GOAL.height + r, 60, GAME_HEIGHT - 80 - GOAL.height + r);
-      bg.lineBetween(GAME_WIDTH - 60, GAME_HEIGHT - 80 - GOAL.height + r, GAME_WIDTH, GAME_HEIGHT - 80 - GOAL.height + r);
-    }
-    for (let c = 0; c < 60; c += 18) {
-      bg.lineBetween(c, GAME_HEIGHT - 80 - GOAL.height, c, GAME_HEIGHT - 80);
-      bg.lineBetween(GAME_WIDTH - 60 + c, GAME_HEIGHT - 80 - GOAL.height, GAME_WIDTH - 60 + c, GAME_HEIGHT - 80);
-    }
-
-    // Goal posts
-    bg.lineStyle(6, 0xdddddd);
-    bg.lineBetween(60, GAME_HEIGHT - 80 - GOAL.height, 60, GAME_HEIGHT - 80);  // left post
-    bg.lineBetween(GAME_WIDTH - 60, GAME_HEIGHT - 80 - GOAL.height, GAME_WIDTH - 60, GAME_HEIGHT - 80);  // right post
-    bg.lineBetween(60, GAME_HEIGHT - 80 - GOAL.height, 0, GAME_HEIGHT - 80 - GOAL.height);  // left crossbar
-    bg.lineBetween(GAME_WIDTH - 60, GAME_HEIGHT - 80 - GOAL.height, GAME_WIDTH, GAME_HEIGHT - 80 - GOAL.height);  // right crossbar
-  }
-
-  _createWalls() {
-    const w = GAME_WIDTH, h = GAME_HEIGHT;
-    const thick = 40;
-    const crossbarY = h - 80 - GOAL.height; // y of the top of the goal opening
-
-    // Floor
-    this.matter.add.rectangle(w / 2, h - 80 + thick / 2, w, thick, { isStatic: true, friction: 0.3, restitution: 0.2, label: 'floor' });
-    // Ceiling
-    this.matter.add.rectangle(w / 2, -thick / 2, w, thick, { isStatic: true, restitution: 0.5, label: 'ceiling' });
-
-    // Left outer wall — only ABOVE the goal opening (so ball can enter goal below)
-    const leftWallH = crossbarY;  // from top (y=0) down to crossbar
-    this.matter.add.rectangle(-thick / 2, leftWallH / 2, thick, leftWallH, { isStatic: true, restitution: 0.3, label: 'wall' });
-    // Left goal back wall (ball bounces off back of net)
-    this.matter.add.rectangle(-thick, h - 80 - GOAL.height / 2, thick, GOAL.height, { isStatic: true, restitution: 0.4, label: 'goalback' });
-
-    // Right outer wall — only above the goal opening
-    this.matter.add.rectangle(w + thick / 2, leftWallH / 2, thick, leftWallH, { isStatic: true, restitution: 0.3, label: 'wall' });
-    // Right goal back wall
-    this.matter.add.rectangle(w + thick, h - 80 - GOAL.height / 2, thick, GOAL.height, { isStatic: true, restitution: 0.4, label: 'goalback' });
-
-    // Vertical goal posts are visual only — no physics bodies here.
-    // A solid post body would block the ball from entering the goal entirely.
-    // The crossbars block shots that come in from above.
-    // Left crossbar
-    this.matter.add.rectangle(31, crossbarY, 62, 10, { isStatic: true, restitution: 0.5, label: 'goalpost' });
-    // Right crossbar
-    this.matter.add.rectangle(w - 31, crossbarY, 62, 10, { isStatic: true, restitution: 0.5, label: 'goalpost' });
   }
 
   _createGoals() {
