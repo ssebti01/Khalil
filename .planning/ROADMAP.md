@@ -10,7 +10,7 @@ Polish and expand the Head Soccer Phaser 3 game with bug fixes, visual improveme
 - [ ] **Phase 2: Head Visuals** - Bigger heads with wobble/spring physics on impact
 - [ ] **Phase 3: Pause Menu** - ESC pause with resume/restart/home options
 - [x] **Phase 4: Map System** - Data-driven map architecture with map selector UI (completed 2026-04-14)
-- [ ] **Phase 5: Morocco Maps** - Rabat and Bouskoura Forest arenas
+- [x] **Phase 5: Morocco Maps** - Rabat and Bouskoura Forest arenas (completed 2026-04-14)
 - [ ] **Phase 6: Asia & NYC Maps** - Shanghai and New York City arenas
 - [ ] **Phase 7: US Maps & Polish** - Chicago and Houston arenas, full integration pass
 
@@ -82,7 +82,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 05-01: Implement Rabat and Bouskoura maps in maps.js with procedural Phaser canvas backgrounds and obstacle definitions
+- [x] 05-01: Implement Rabat and Bouskoura maps in maps.js with procedural Phaser canvas backgrounds and obstacle definitions
 
 ### Phase 6: Asia & NYC Maps
 **Goal**: Implement two internationally-themed arenas (Shanghai rooftop, New York City street court).
@@ -120,6 +120,6 @@ Plans:
 | 2. Head Visuals | 0/1 | Not started | - |
 | 3. Pause Menu | 0/1 | Not started | - |
 | 4. Map System | 2/2 | Complete   | 2026-04-14 |
-| 5. Morocco Maps | 0/1 | Not started | - |
+| 5. Morocco Maps | 1/1 | Complete   | 2026-04-14 |
 | 6. Asia & NYC Maps | 0/1 | Not started | - |
 | 7. US Maps & Polish | 0/2 | Not started | - |
