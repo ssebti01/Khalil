@@ -1,13 +1,4 @@
-import { PLAYER, GAME_WIDTH, GAME_HEIGHT } from '../config/constants.js';
-
-// CPU acceleration: px/frame² applied each tick. Lower = smoother, less "magnetic".
-const CPU_ACCEL = 0.8;
-// How close to target before stopping (dead zone)
-const CPU_DEAD_ZONE = 24;
-// After touching the ball, wait this many ms before re-targeting it
-const CPU_CONTACT_COOLDOWN = 350;
-// Lateral offset from ball center so CPU hits the ball rather than centering on it
-const CPU_STRIKE_OFFSET = 40;
+import { PLAYER, GAME_WIDTH, GAME_HEIGHT, CPU_AI } from '../config/constants.js';
 
 // Simple state-machine AI: DEFEND | CHASE | SHOOT
 export class CPUPlayer {
@@ -15,14 +6,14 @@ export class CPUPlayer {
     this.player = player;       // Player entity
     this.opponentSide = opponentSide; // 'left' or 'right'
     this.state = 'CHASE';
-    this.reactionDelay = 120;   // ms between state decisions
     this._lastDecision = 0;
     this._abilityTimer = 0;
     this._contactCooldownUntil = 0; // pause re-targeting after touching ball
+    this._nearBallLastFrame = false; // edge-detection: only trigger cooldown on first contact
   }
 
   update(time, delta, ball) {
-    if (time - this._lastDecision < this.reactionDelay) return;
+    if (time - this._lastDecision < CPU_AI.reactionDelay) return;
     this._lastDecision = time;
 
     const p = this.player;
@@ -41,11 +32,12 @@ export class CPUPlayer {
       this.state = 'CHASE';
     }
 
-    // Detect contact: ball very close to player → start cooldown
-    const distToBall = Math.abs(ball.x - p.x);
-    if (distToBall < PLAYER.headRadius + 30) {
-      this._contactCooldownUntil = time + CPU_CONTACT_COOLDOWN;
+    // Contact detection: only trigger cooldown on the leading edge (first frame of contact)
+    const nearBall = Math.abs(ball.x - p.x) < PLAYER.headRadius + 30;
+    if (nearBall && !this._nearBallLastFrame) {
+      this._contactCooldownUntil = time + CPU_AI.contactCooldown;
     }
+    this._nearBallLastFrame = nearBall;
 
     // Compute target X
     let targetX;
@@ -55,25 +47,23 @@ export class CPUPlayer {
       // Just touched the ball — hold position briefly so ball can escape
       targetX = p.x;
     } else {
-      // Approach ball from the side that allows a shot on opponent goal
-      const strikeDir = p.side === 'left' ? -1 : 1; // approach from behind ball
-      targetX = ball.x + strikeDir * CPU_STRIKE_OFFSET;
+      // Approach ball from behind so contact results in a shot, not a pin
+      const strikeDir = p.side === 'left' ? -1 : 1;
+      targetX = ball.x + strikeDir * CPU_AI.strikeOffset;
     }
 
     // Force-based horizontal movement — accelerate toward target, decelerate near it
     const dx = targetX - p.x;
     const maxSpeed = PLAYER.runSpeed * p.char.stats.speed;
-    const body = p.sprite.body;
-    const currentVX = body.velocity.x;
+    const currentVX = p.sprite.body.velocity.x;
 
-    if (Math.abs(dx) > CPU_DEAD_ZONE) {
+    if (Math.abs(dx) > CPU_AI.deadZone) {
       const dir = Math.sign(dx);
-      // Apply acceleration in target direction, capped at maxSpeed
-      const newVX = Math.max(-maxSpeed, Math.min(maxSpeed, currentVX + dir * CPU_ACCEL));
+      const newVX = Math.max(-maxSpeed, Math.min(maxSpeed, currentVX + dir * CPU_AI.accel));
       p.sprite.setVelocityX(newVX);
     } else {
-      // Dead zone: decelerate to stop
-      const newVX = currentVX * 0.7;
+      // Dead zone: mirror the player damping epsilon so stopping feels identical
+      const newVX = currentVX * 0.75;
       p.sprite.setVelocityX(Math.abs(newVX) < 0.5 ? 0 : newVX);
     }
 
@@ -83,9 +73,9 @@ export class CPUPlayer {
     }
 
     // Random ability use
-    if (time > this._abilityTimer + 10000) {
+    if (time > this._abilityTimer + CPU_AI.abilityInterval) {
       this._abilityTimer = time;
-      if (Math.random() < 0.4) {
+      if (Math.random() < CPU_AI.abilityChance) {
         p.abilityCooldown = 0;
         p._useAbility(time, ball);
       }
