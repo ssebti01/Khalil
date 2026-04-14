@@ -76,8 +76,8 @@ describe('maps config', () => {
       expect(bouskoura.obstacles).toHaveLength(3);
     });
 
-    it('has slippery floor (floorFriction 0.001)', () => {
-      expect(bouskoura.floorFriction).toBe(0.001);
+    it('has slippery floor (floorFriction 0.01)', () => {
+      expect(bouskoura.floorFriction).toBe(0.01);
     });
 
     it('windForce is null and specialZones is empty', () => {

@@ -1,4 +1,4 @@
-import { GAME_WIDTH, GAME_HEIGHT, GOAL, PHYSICS, PLAYER } from './constants.js';
+import { GAME_WIDTH, GAME_HEIGHT, GOAL, PLAYER } from './constants.js';
 
 export const MAPS = [
   {
@@ -107,7 +107,7 @@ export const MAPS = [
     id: 'bouskoura',
     name: 'Bouskoura Forest',
     floorRestitution: 0.2,
-    floorFriction: 0.001,   // slippery leaves
+    floorFriction: 0.01,    // slippery leaves — 0.001 caused degenerate CPU physics
     background: {
       type: 'gradient',
       skyColors: [0x0a1a05, 0x1a3a0a],

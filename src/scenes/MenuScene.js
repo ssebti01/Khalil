@@ -13,6 +13,13 @@ export class MenuScene extends Phaser.Scene {
   }
 
   create() {
+    // Restore state across scene.restart() (e.g. after mode toggle)
+    const data = this.scene.settings.data || {};
+    if (data.p1CharIndex !== undefined) this.p1CharIndex = data.p1CharIndex;
+    if (data.p2CharIndex !== undefined) this.p2CharIndex = data.p2CharIndex;
+    if (data.vsMode      !== undefined) this.vsMode      = data.vsMode;
+    if (data.mapIndex    !== undefined) this.mapIndex    = data.mapIndex;
+
     this._drawBackground();
     this._drawTitle();
     this._drawModeToggle();
@@ -198,8 +205,13 @@ export class MenuScene extends Phaser.Scene {
   }
 
   _updateCharLabels() {
-    // Redraw labels based on vsMode — rebuild scene is simplest
-    this.scene.restart();
+    // Redraw labels based on vsMode — rebuild scene, preserving selection state
+    this.scene.restart({
+      p1CharIndex: this.p1CharIndex,
+      p2CharIndex: this.p2CharIndex,
+      vsMode: this.vsMode,
+      mapIndex: this.mapIndex,
+    });
   }
 
   _changeChar(pIndex, dir) {

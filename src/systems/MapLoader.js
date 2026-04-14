@@ -69,6 +69,9 @@ export function drawBackground(scene, mapConfig) {
   // Note: decoration shares the same graphics object `g` as the base background,
   // so it always renders on top of pitch/crowd but cannot control its own layer order.
   if (mapConfig.decoration) {
+    // Reset graphics state so decoration starts from a clean baseline
+    g.lineStyle(0);
+    g.fillStyle(0xffffff, 1);
     mapConfig.decoration(scene, g);
   }
 }
@@ -138,8 +141,20 @@ export function createObstacles(scene, mapConfig) {
       g.fillStyle(obs.visual.color, obs.visual.alpha ?? 1);
       if (obs.type === 'circle') {
         g.fillCircle(obs.x, obs.y, obs.r);
+      } else if (obs.angle) {
+        // Ramp / rotated obstacle — draw a rotated polygon so visual matches physics body
+        const hw = obs.w / 2, hh = obs.h / 2;
+        const cos = Math.cos(obs.angle), sin = Math.sin(obs.angle);
+        // Four corners of the rectangle, rotated around center (obs.x, obs.y)
+        const corners = [
+          [-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh],
+        ].map(([cx, cy]) => ({
+          x: obs.x + cx * cos - cy * sin,
+          y: obs.y + cx * sin + cy * cos,
+        }));
+        g.fillPoints(corners, true);
       } else {
-        // box / ramp / platform — all rectangular visuals
+        // box / platform — axis-aligned
         g.fillRect(obs.x - obs.w / 2, obs.y - obs.h / 2, obs.w, obs.h);
       }
     }
