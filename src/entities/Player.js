@@ -40,6 +40,12 @@ export class Player {
     });
     this.sprite.setFixedRotation();
     this.sprite.setDepth(20);
+
+    // Zero X velocity if window loses focus — prevents held-key drift on alt-tab
+    // Only X is zeroed so mid-air jump arcs are not interrupted by focus changes
+    this.scene.game.events.on('blur', () => {
+      this.sprite.setVelocityX(0);
+    });
   }
 
   get x() { return this.sprite.x; }
