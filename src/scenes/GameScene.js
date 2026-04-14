@@ -6,8 +6,10 @@ import { getCharacter } from '../config/characters.js';
 import {
   GAME_WIDTH, GAME_HEIGHT, MATCH, PLAYER, GOAL, PHYSICS,
 } from '../config/constants.js';
-import { getMap } from '../config/maps.js';
+import { getMap, MAPS } from '../config/maps.js';
 import { drawBackground, createObstacles } from '../systems/MapLoader.js';
+
+const Matter = Phaser.Physics.Matter.Matter;
 
 export class GameScene extends Phaser.Scene {
   constructor() { super({ key: 'GameScene' }); }
@@ -22,6 +24,9 @@ export class GameScene extends Phaser.Scene {
     this.matchOver = false;
     this.paused = false;
     this.mapId = data.mapId ?? 'stadium';
+    this._currentMap = MAPS.find(m => m.id === this.mapId) ?? null;
+    this._windActive = false;
+    this._windTimer = null;
   }
 
   create() {
@@ -86,6 +91,9 @@ export class GameScene extends Phaser.Scene {
     // UI scene on top
     this.scene.launch('UIScene', { gameScene: this });
     this.uiScene = this.scene.get('UIScene');
+
+    // Wind mechanic (map-specific)
+    this._setupWind(this._currentMap);
 
     // Timer
     this.time.addEvent({
@@ -176,6 +184,11 @@ export class GameScene extends Phaser.Scene {
   }
 
   _endMatch() {
+    if (this._windTimer) {
+      this._windTimer.remove(false);
+      this._windTimer = null;
+    }
+    this._windActive = false;
     this.matchOver = true;
     let winner;
     if (this.score[0] > this.score[1]) winner = 0;
@@ -192,9 +205,34 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  _setupWind(mapConfig) {
+    if (!mapConfig || !mapConfig.windForce) return;
+    const wf = mapConfig.windForce;
+    this._windTimer = this.time.addEvent({
+      delay: wf.intervalMs,
+      loop: true,
+      callback: () => {
+        this._windActive = true;
+        this.time.delayedCall(500, () => {
+          this._windActive = false;
+        });
+      },
+    });
+  }
+
   update(time, delta) {
     if (this.matchOver) return;
     if (this.paused) return;
+
+    // Wind force application (Chicago map mechanic)
+    if (this._windActive && this._currentMap?.windForce && this.ball?.body) {
+      const wf = this._currentMap.windForce;
+      Matter.Body.applyForce(
+        this.ball.body,
+        this.ball.body.position,
+        { x: wf.x * 0.0001, y: 0 }
+      );
+    }
 
     this.ball.update(delta);
 
