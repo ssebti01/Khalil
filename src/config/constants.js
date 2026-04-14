@@ -59,6 +59,7 @@ export const CPU_AI = {
 
 export const ABILITIES = {
   fire:    { impulseX: 0.06, impulseY: -0.04 },
+  ice:     { freezeDuration: 2000 },
   thunder: { dashSpeed: 15 },
   ninja:   { teleportOffsetY: -60 },
   tiny:    { ballLiftDelay: 350, ballLiftImpulse: 0.08 },
