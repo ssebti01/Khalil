@@ -566,11 +566,12 @@ export const MAPS = [
         visual: { color: 0x8b5e20, alpha: 0 },
       },
       // Launch ramp — angled center box that redirects ball upward
+      // angle: 0.14 rad ≈ 8 degrees (Matter.js uses radians)
       {
         type: 'box',
         x: 640, y: 598,
         w: 160, h: 12,
-        angle: 8,
+        angle: 0.14,
         restitution: 0.4,
         friction: 0.2,
         label: 'ramp',

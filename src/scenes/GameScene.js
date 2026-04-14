@@ -66,6 +66,7 @@ export class GameScene extends Phaser.Scene {
           p1CharId: this.p1CharId,
           p2CharId: this.p2CharId,
           vsMode: this.vsMode,
+          mapId: this.mapId,
         });
       }
     });

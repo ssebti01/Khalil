@@ -58,7 +58,8 @@ export class PauseScene extends Phaser.Scene {
   }
 
   _restart() {
-    const data = this.initData;
+    // Forward all init data including mapId so the correct map reloads
+    const data = { ...this.initData };
     this.scene.stop('PauseScene');
     this.scene.stop('UIScene');
     this.scene.get('GameScene').scene.restart(data);
