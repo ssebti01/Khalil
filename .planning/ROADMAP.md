@@ -68,7 +68,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: Create `src/config/maps.js` schema + `src/systems/MapLoader.js`; refactor GameScene._drawArena and _createWalls to be data-driven
+- [x] 04-01: Create `src/config/maps.js` schema + `src/systems/MapLoader.js`; refactor GameScene._drawArena and _createWalls to be data-driven
 - [ ] 04-02: Add map selection UI to MenuScene; wire mapId through GameScene init data
 
 ### Phase 5: Morocco Maps
@@ -119,7 +119,7 @@ Plans:
 | 1. Bug Fixes | 2/2 | Complete | 2026-04-14 |
 | 2. Head Visuals | 0/1 | Not started | - |
 | 3. Pause Menu | 0/1 | Not started | - |
-| 4. Map System | 0/2 | Not started | - |
+| 4. Map System | 1/2 | In Progress|  |
 | 5. Morocco Maps | 0/1 | Not started | - |
 | 6. Asia & NYC Maps | 0/1 | Not started | - |
 | 7. US Maps & Polish | 0/2 | Not started | - |
