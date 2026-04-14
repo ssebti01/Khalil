@@ -97,5 +97,48 @@ export class UIScene extends Phaser.Scene {
 
     // Keep p1Color/p2Color for potential future use; update HUDs if player exists
     void p1Color; void p2Color;
+
+    if (this._p1AbilHud && gs.p1) this._updateAbilityHUD(this._p1AbilHud, p1Ratio, gs.p1.char);
+    if (this._p2AbilHud && gs.p2) this._updateAbilityHUD(this._p2AbilHud, p2Ratio, gs.p2.char);
+  }
+
+  _updateAbilityHUD(hud, ratio, char) {
+    const ready = ratio >= 1;
+    const secsRemaining = ready ? 0 : Math.ceil((1 - ratio) * ABILITY_COOLDOWN / 1000);
+
+    // Lazy-init emoji on first frame where char is available (RESEARCH Pitfall 5)
+    if (hud.icon.text !== char.emoji) hud.icon.setText(char.emoji);
+
+    // Countdown: show seconds if on cooldown, hide if ready (D-02)
+    hud.countdown.setText(ready ? '' : String(secsRemaining));
+
+    // Pulse-tween lifecycle — edge-triggered to prevent stacking (RESEARCH Pitfall 2)
+    if (ready && !hud.wasReady) {
+      hud.pulseTween = this.tweens.add({
+        targets: hud.icon,
+        alpha: { from: 1, to: 0.45 },
+        scaleX: { from: 1, to: 1.12 },
+        scaleY: { from: 1, to: 1.12 },
+        duration: 500,
+        ease: 'Sine.easeInOut',
+        yoyo: true,
+        repeat: -1,
+      });
+      hud.wasReady = true;
+    } else if (!ready && hud.wasReady) {
+      if (hud.pulseTween) {
+        hud.pulseTween.stop();
+        hud.pulseTween = null;
+      }
+      hud.icon.setAlpha(1).setScale(1);
+      hud.wasReady = false;
+    }
+
+    // Glow background — tinted with char.accentColor when ready (D-03)
+    hud.glowBg.clear();
+    if (ready) {
+      hud.glowBg.fillStyle(char.accentColor, 0.25);
+      hud.glowBg.fillCircle(hud.icon.x, hud.icon.y, 28);
+    }
   }
 }
