@@ -177,6 +177,297 @@ export const MAPS = [
     windForce: null,
     specialZones: [],
   },
+  {
+    id: 'shanghai',
+    name: 'Shanghai \u2014 Skyscraper Rooftop',
+    floorRestitution: 0.2,
+    floorFriction: 0.3,
+    windForce: null,
+    background: (scene) => {
+      const bg = scene.add.graphics();
+
+      // Sky: deep purple to magenta sunset gradient
+      bg.fillGradientStyle(0x1a0033, 0x1a0033, 0x4a0066, 0x4a0066, 1);
+      bg.fillRect(0, 0, 1280, 720);
+
+      // Horizon glow: warm orange band near floor line
+      bg.fillGradientStyle(0xff6600, 0xff6600, 0x4a0066, 0x4a0066, 0.55);
+      bg.fillRect(0, 460, 1280, 200);
+
+      // Shanghai skyline silhouettes in crowd zone (y 560–640)
+      bg.fillStyle(0x0d0022, 1);
+      const buildings = [
+        [40, 38, 90], [100, 28, 70], [150, 45, 110], [220, 30, 80],
+        [270, 52, 130], [345, 28, 65], [400, 35, 95],
+        [820, 35, 95], [875, 52, 130], [950, 30, 80],
+        [1000, 45, 110], [1070, 28, 70], [1120, 38, 90], [1180, 32, 75],
+      ];
+      buildings.forEach(([bx, bw, bh]) => {
+        bg.fillRect(bx, 640 - bh, bw, bh);
+        bg.fillRect(bx + bw / 2 - 2, 640 - bh - 20, 4, 20);
+      });
+
+      // Concrete rooftop pitch
+      bg.fillStyle(0x555566, 1);
+      bg.fillRect(0, 640, 1280, 80);
+
+      // Subtle pitch line markings
+      bg.lineStyle(1, 0x7777aa, 0.4);
+      bg.lineBetween(640, 640, 640, 720);
+      bg.strokeCircle(640, 640, 55);
+
+      // Goal net backgrounds
+      bg.fillStyle(0x0a0020, 0.6);
+      bg.fillRect(0, 450, 60, 190);
+      bg.fillRect(1220, 450, 60, 190);
+
+      // Net grid
+      bg.lineStyle(1, 0xcc88ff, 0.25);
+      for (let r = 0; r < 190; r += 18) {
+        bg.lineBetween(0, 450 + r, 60, 450 + r);
+        bg.lineBetween(1220, 450 + r, 1280, 450 + r);
+      }
+      for (let c = 0; c < 60; c += 18) {
+        bg.lineBetween(c, 450, c, 640);
+        bg.lineBetween(1220 + c, 450, 1220 + c, 640);
+      }
+
+      // Goal posts
+      bg.lineStyle(6, 0xdddddd, 1);
+      bg.lineBetween(60, 450, 60, 640);
+      bg.lineBetween(1220, 450, 1220, 640);
+      bg.lineBetween(0, 450, 60, 450);
+      bg.lineBetween(1220, 450, 1280, 450);
+
+      // Bamboo scaffold visuals
+      bg.fillStyle(0x99cc22, 0.85);
+      bg.fillRect(420, 504, 130, 14);
+      bg.fillRect(418, 500, 8, 22);
+      bg.fillRect(544, 500, 8, 22);
+      bg.lineStyle(1, 0x668800, 0.7);
+      bg.lineBetween(420, 510, 550, 506);
+
+      bg.fillStyle(0x99cc22, 0.85);
+      bg.fillRect(730, 504, 130, 14);
+      bg.fillRect(728, 500, 8, 22);
+      bg.fillRect(854, 500, 8, 22);
+      bg.lineStyle(1, 0x668800, 0.7);
+      bg.lineBetween(730, 506, 860, 510);
+
+      // Edge bumper visuals
+      bg.fillStyle(0xcc4400, 0.9);
+      bg.fillCircle(200, 600, 20);
+      bg.fillStyle(0xff6622, 0.6);
+      bg.fillCircle(200, 600, 13);
+
+      bg.fillStyle(0xcc4400, 0.9);
+      bg.fillCircle(1080, 600, 20);
+      bg.fillStyle(0xff6622, 0.6);
+      bg.fillCircle(1080, 600, 13);
+    },
+    obstacles: [
+      // Left bamboo scaffold platform — angled box (~5 deg tilt = 0.0873 rad)
+      {
+        type: 'box',
+        x: 485, y: 510,
+        w: 130, h: 12,
+        angle: 0.0873,
+        restitution: 0.3,
+        friction: 0.4,
+        label: 'scaffold_left',
+        visual: { color: 0x99cc22, alpha: 0 },
+      },
+      // Right bamboo scaffold platform — mirrored (~-5 deg = -0.0873 rad)
+      {
+        type: 'box',
+        x: 795, y: 510,
+        w: 130, h: 12,
+        angle: -0.0873,
+        restitution: 0.3,
+        friction: 0.4,
+        label: 'scaffold_right',
+        visual: { color: 0x99cc22, alpha: 0 },
+      },
+      // Left rooftop edge bumper — bouncy circle
+      {
+        type: 'circle',
+        x: 200, y: 600,
+        r: 20,
+        restitution: 0.7,
+        friction: 0.1,
+        label: 'bumper_left',
+        visual: { color: 0xcc4400, alpha: 0 },
+      },
+      // Right rooftop edge bumper — mirrored
+      {
+        type: 'circle',
+        x: 1080, y: 600,
+        r: 20,
+        restitution: 0.7,
+        friction: 0.1,
+        label: 'bumper_right',
+        visual: { color: 0xcc4400, alpha: 0 },
+      },
+    ],
+    specialZones: [],
+  },
+  {
+    id: 'nyc',
+    name: 'New York City \u2014 Street Court',
+    floorRestitution: 0.2,
+    floorFriction: 0.35,
+    windForce: null,
+    background: (scene) => {
+      const bg = scene.add.graphics();
+
+      // Sky: deep blue twilight gradient
+      bg.fillGradientStyle(0x1a1a2e, 0x1a1a2e, 0x16213e, 0x16213e, 1);
+      bg.fillRect(0, 0, 1280, 720);
+
+      // NYC building silhouettes in crowd zone
+      bg.fillStyle(0x0a0a1a, 1);
+      const nycBuildings = [
+        [30, 55, 100], [95, 30, 75], [140, 60, 120], [215, 25, 60],
+        [255, 40, 85], [310, 65, 140], [390, 28, 70], [435, 35, 90],
+        [800, 35, 90], [850, 28, 70], [895, 65, 140], [975, 40, 85],
+        [1030, 25, 60], [1075, 60, 120], [1150, 30, 75], [1195, 55, 100],
+      ];
+      nycBuildings.forEach(([bx, bw, bh]) => {
+        bg.fillRect(bx, 640 - bh, bw, bh);
+        if (bh > 90) {
+          bg.fillStyle(0xffee88, 0.5);
+          for (let wy = 640 - bh + 10; wy < 635; wy += 18) {
+            for (let wx = bx + 6; wx < bx + bw - 6; wx += 12) {
+              if (Math.abs((wx + wy) % 7) > 2) bg.fillRect(wx, wy, 5, 7);
+            }
+          }
+          bg.fillStyle(0x0a0a1a, 1);
+        }
+      });
+
+      // Yellow taxis in crowd zone
+      bg.fillStyle(0xffcc00, 1);
+      bg.fillRect(510, 610, 60, 24);
+      bg.fillRect(515, 604, 40, 10);
+      bg.fillStyle(0x222222, 1);
+      bg.fillCircle(518, 634, 6);
+      bg.fillCircle(562, 634, 6);
+      bg.fillStyle(0xffcc00, 1);
+      bg.fillRect(710, 610, 60, 24);
+      bg.fillRect(715, 604, 40, 10);
+      bg.fillStyle(0x222222, 1);
+      bg.fillCircle(718, 634, 6);
+      bg.fillCircle(762, 634, 6);
+
+      // Asphalt pitch
+      bg.fillStyle(0x2a2a2a, 1);
+      bg.fillRect(0, 640, 1280, 80);
+
+      // Faded basketball court lines
+      bg.lineStyle(2, 0xff6600, 0.35);
+      bg.strokeRect(120, 640, 380, 78);
+      bg.strokeRect(780, 640, 380, 78);
+      bg.strokeCircle(640, 640, 70);
+
+      // Goal net backgrounds
+      bg.fillStyle(0x050510, 0.7);
+      bg.fillRect(0, 450, 60, 190);
+      bg.fillRect(1220, 450, 60, 190);
+
+      // Net grid
+      bg.lineStyle(1, 0x8899ff, 0.2);
+      for (let r = 0; r < 190; r += 18) {
+        bg.lineBetween(0, 450 + r, 60, 450 + r);
+        bg.lineBetween(1220, 450 + r, 1280, 450 + r);
+      }
+      for (let c = 0; c < 60; c += 18) {
+        bg.lineBetween(c, 450, c, 640);
+        bg.lineBetween(1220 + c, 450, 1220 + c, 640);
+      }
+
+      // Goal posts
+      bg.lineStyle(6, 0xdddddd, 1);
+      bg.lineBetween(60, 450, 60, 640);
+      bg.lineBetween(1220, 450, 1220, 640);
+      bg.lineBetween(0, 450, 60, 450);
+      bg.lineBetween(1220, 450, 1280, 450);
+
+      // Fire hydrant visual
+      bg.fillStyle(0xcc1111, 1);
+      bg.fillCircle(400, 620, 18);
+      bg.fillStyle(0xff3333, 0.6);
+      bg.fillCircle(400, 615, 10);
+
+      // Yellow taxi barrier
+      bg.fillStyle(0xffcc00, 1);
+      bg.fillRect(750, 580, 170, 40);
+      bg.fillStyle(0x222222, 1);
+      bg.fillCircle(770, 622, 9);
+      bg.fillCircle(900, 622, 9);
+      bg.fillStyle(0xffee44, 0.8);
+      bg.fillRect(755, 585, 160, 10);
+
+      // Street lamp post
+      bg.fillStyle(0x888899, 1);
+      bg.fillRect(635, 480, 10, 160);
+      bg.fillRect(625, 476, 30, 8);
+      bg.fillStyle(0xffffaa, 0.7);
+      bg.fillRect(628, 480, 24, 5);
+
+      // Subway grate visual
+      bg.fillStyle(0x333344, 1);
+      bg.fillRect(560, 630, 160, 10);
+      bg.lineStyle(1, 0x555566, 0.9);
+      for (let gx = 560; gx < 720; gx += 16) {
+        bg.lineBetween(gx, 630, gx, 640);
+      }
+      bg.lineStyle(1, 0x555566, 0.6);
+      bg.lineBetween(560, 635, 720, 635);
+    },
+    obstacles: [
+      // Fire hydrant — bouncy circle deflector
+      {
+        type: 'circle',
+        x: 400, y: 620,
+        r: 18,
+        restitution: 0.6,
+        friction: 0.2,
+        label: 'hydrant',
+        visual: { color: 0xcc1111, alpha: 0 },
+      },
+      // Yellow taxi barrier — wide low box
+      {
+        type: 'box',
+        x: 835, y: 600,
+        w: 170, h: 40,
+        angle: 0,
+        restitution: 0.3,
+        friction: 0.4,
+        label: 'taxi',
+        visual: { color: 0xffcc00, alpha: 0 },
+      },
+      // Street lamp post — thin tall box (dead center)
+      {
+        type: 'box',
+        x: 640, y: 560,
+        w: 10, h: 160,
+        angle: 0,
+        restitution: 0.2,
+        friction: 0.5,
+        label: 'lamppost',
+        visual: { color: 0x888899, alpha: 0 },
+      },
+    ],
+    specialZones: [
+      // Subway grate trampoline — center pitch, impulse ball upward
+      {
+        type: 'trampoline',
+        x: 560, y: 630,
+        w: 160, h: 10,
+        impulseY: -18,
+      },
+    ],
+  },
 ];
 
 export function getMap(id) {

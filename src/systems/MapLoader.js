@@ -2,10 +2,21 @@ import { GAME_WIDTH, GAME_HEIGHT, GOAL } from '../config/constants.js';
 
 /**
  * Draws the background visuals for a map (sky, crowd, pitch, markings, nets, goal posts).
+ *
+ * Supports two background formats:
+ *   - Object format (legacy): background.skyColors, pitchColor, etc. — drawn procedurally here.
+ *   - Function format: background(scene) — the function is responsible for all drawing.
+ *
  * @param {Phaser.Scene} scene
  * @param {object} mapConfig - map config object from MAPS array
  */
 export function drawBackground(scene, mapConfig) {
+  // Function-based background: delegate all drawing to the map's own function.
+  if (typeof mapConfig.background === 'function') {
+    mapConfig.background(scene);
+    return;
+  }
+
   const { background: bg_cfg } = mapConfig;
   const g = scene.add.graphics();
 
@@ -173,5 +184,43 @@ export function createObstacles(scene, mapConfig) {
     } else {
       scene.matter.add.rectangle(obs.x, obs.y, obs.w, obs.h, bodyOpts);
     }
+  }
+
+  // --- Special zones ---
+  for (const zone of (mapConfig.specialZones ?? [])) {
+    if (zone.type === 'trampoline') {
+      // Create a static sensor that detects when the ball enters the zone.
+      const sensor = scene.matter.add.rectangle(
+        zone.x + zone.w / 2,
+        zone.y + zone.h / 2,
+        zone.w,
+        zone.h,
+        { isStatic: true, isSensor: true, label: 'trampoline' }
+      );
+      // Store impulse on the body so the collision handler can read it.
+      sensor.impulseY = zone.impulseY;
+    }
+  }
+
+  // Wire trampoline impulse via collision events (only once per scene).
+  if ((mapConfig.specialZones ?? []).some(z => z.type === 'trampoline')) {
+    scene.matter.world.on('collisionstart', (event) => {
+      event.pairs.forEach(pair => {
+        const { bodyA, bodyB } = pair;
+        let ball = null;
+        let trampBody = null;
+        if (bodyA.label === 'ball' && bodyB.label === 'trampoline') {
+          ball = bodyA; trampBody = bodyB;
+        } else if (bodyB.label === 'ball' && bodyA.label === 'trampoline') {
+          ball = bodyB; trampBody = bodyA;
+        }
+        if (ball && trampBody) {
+          const impulseY = trampBody.impulseY ?? -18;
+          // Apply upward velocity boost — clamp so the ball doesn't exceed a sane speed.
+          const newVy = Math.min(ball.velocity.y, 0) + impulseY;
+          Phaser.Physics.Matter.Matter.Body.setVelocity(ball, { x: ball.velocity.x, y: newVy });
+        }
+      });
+    });
   }
 }

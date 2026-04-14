@@ -2,15 +2,17 @@ import { describe, it, expect } from 'vitest';
 import { MAPS, getMap, getMaps } from '../src/config/maps.js';
 
 describe('maps config', () => {
-  it('MAPS array has exactly 3 entries in the correct order', () => {
-    expect(MAPS).toHaveLength(3);
+  it('MAPS array has exactly 5 entries in the correct order', () => {
+    expect(MAPS).toHaveLength(5);
     expect(MAPS[0].id).toBe('stadium');
     expect(MAPS[1].id).toBe('rabat');
     expect(MAPS[2].id).toBe('bouskoura');
+    expect(MAPS[3].id).toBe('shanghai');
+    expect(MAPS[4].id).toBe('nyc');
   });
 
-  it('getMaps() returns all 3 maps', () => {
-    expect(getMaps()).toHaveLength(3);
+  it('getMaps() returns all 5 maps', () => {
+    expect(getMaps()).toHaveLength(5);
   });
 
   it('getMap() retrieves by id', () => {
@@ -121,6 +123,108 @@ describe('maps config', () => {
 
     it('has no decoration function', () => {
       expect(stadium.decoration).toBeUndefined();
+    });
+  });
+
+  describe('Shanghai map', () => {
+    const shanghai = getMap('shanghai');
+
+    it('has exactly 4 obstacles', () => {
+      expect(shanghai.obstacles).toHaveLength(4);
+    });
+
+    it('has function-based background', () => {
+      expect(typeof shanghai.background).toBe('function');
+    });
+
+    it('has empty specialZones', () => {
+      expect(shanghai.specialZones).toEqual([]);
+    });
+
+    it('has expected floor physics', () => {
+      expect(shanghai.floorFriction).toBe(0.3);
+      expect(shanghai.floorRestitution).toBe(0.2);
+    });
+
+    it('windForce is null', () => {
+      expect(shanghai.windForce).toBeNull();
+    });
+
+    it('has two scaffold platforms and two bumper circles', () => {
+      const scaffolds = shanghai.obstacles.filter(o => o.label.startsWith('scaffold'));
+      const bumpers = shanghai.obstacles.filter(o => o.label.startsWith('bumper'));
+      expect(scaffolds).toHaveLength(2);
+      expect(bumpers).toHaveLength(2);
+    });
+
+    it('scaffold platforms are angled box type', () => {
+      const scaffolds = shanghai.obstacles.filter(o => o.label.startsWith('scaffold'));
+      scaffolds.forEach(s => {
+        expect(s.type).toBe('box');
+        expect(Math.abs(s.angle)).toBeGreaterThan(0);
+      });
+    });
+
+    it('bumpers are circle type with high restitution', () => {
+      const bumpers = shanghai.obstacles.filter(o => o.label.startsWith('bumper'));
+      bumpers.forEach(b => {
+        expect(b.type).toBe('circle');
+        expect(b.restitution).toBeGreaterThanOrEqual(0.7);
+      });
+    });
+  });
+
+  describe('NYC map', () => {
+    const nyc = getMap('nyc');
+
+    it('has exactly 3 obstacles', () => {
+      expect(nyc.obstacles).toHaveLength(3);
+    });
+
+    it('has function-based background', () => {
+      expect(typeof nyc.background).toBe('function');
+    });
+
+    it('has exactly 1 trampoline special zone', () => {
+      expect(nyc.specialZones).toHaveLength(1);
+      expect(nyc.specialZones[0].type).toBe('trampoline');
+    });
+
+    it('subway grate trampoline has correct impulse and position', () => {
+      const grate = nyc.specialZones[0];
+      expect(grate.impulseY).toBe(-18);
+      expect(grate.x).toBe(560);
+      expect(grate.y).toBe(630);
+      expect(grate.w).toBe(160);
+    });
+
+    it('has expected floor physics', () => {
+      expect(nyc.floorFriction).toBe(0.35);
+      expect(nyc.floorRestitution).toBe(0.2);
+    });
+
+    it('windForce is null', () => {
+      expect(nyc.windForce).toBeNull();
+    });
+
+    it('has hydrant, taxi, and lamppost obstacles', () => {
+      const labels = nyc.obstacles.map(o => o.label);
+      expect(labels).toContain('hydrant');
+      expect(labels).toContain('taxi');
+      expect(labels).toContain('lamppost');
+    });
+
+    it('hydrant is a circle with restitution 0.6', () => {
+      const hydrant = nyc.obstacles.find(o => o.label === 'hydrant');
+      expect(hydrant.type).toBe('circle');
+      expect(hydrant.restitution).toBe(0.6);
+    });
+
+    it('lamppost is a narrow tall box at center', () => {
+      const lamp = nyc.obstacles.find(o => o.label === 'lamppost');
+      expect(lamp.type).toBe('box');
+      expect(lamp.x).toBe(640);
+      expect(lamp.w).toBeLessThanOrEqual(10);
     });
   });
 });
