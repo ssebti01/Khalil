@@ -156,10 +156,9 @@ export class GameScene extends Phaser.Scene {
     // Right goal back wall
     this.matter.add.rectangle(w + thick, h - 80 - GOAL.height / 2, thick, GOAL.height, { isStatic: true, restitution: 0.4, label: 'goalback' });
 
-    // Left goal post (vertical bar players and ball bounce off)
-    this.matter.add.rectangle(62, h - 80 - GOAL.height / 2, 10, GOAL.height, { isStatic: true, restitution: 0.4, label: 'goalpost' });
-    // Right goal post
-    this.matter.add.rectangle(w - 62, h - 80 - GOAL.height / 2, 10, GOAL.height, { isStatic: true, restitution: 0.4, label: 'goalpost' });
+    // Vertical goal posts are visual only — no physics bodies here.
+    // A solid post body would block the ball from entering the goal entirely.
+    // The crossbars block shots that come in from above.
     // Left crossbar
     this.matter.add.rectangle(31, crossbarY, 62, 10, { isStatic: true, restitution: 0.5, label: 'goalpost' });
     // Right crossbar
