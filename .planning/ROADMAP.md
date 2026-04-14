@@ -126,10 +126,11 @@ Plans:
 
 ### Phase 8: Ability System Polish
 
-**Goal:** Audit and fix power-up logic (fire/ice/thunder/ninja/tiny), redesign in-game ability HUD with icons, cooldown bars, and activation visual feedback.
-**Requirements**: TBD
+**Goal:** Fix the ability-branch id-mismatch bug so all five abilities (fire/ice/thunder/ninja/tiny) actually execute for their matching characters (khalil/beboush/lilya/fafa/sara), close the tiny delayed-callback hazard, and replace the clipped bottom-corner cooldown bars with a top-center emoji+countdown HUD that pulses/glows with each character's accentColor when ready.
+**Requirements**: D-01, D-02, D-03, D-04, D-05 (from 08-CONTEXT.md)
 **Depends on:** Phase 5
-**Plans:** 2/2 plans complete
+**Plans:** 2 plans
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 8 to break down)
+- [ ] 08-01-PLAN.md — Ability logic audit & fix: rewrite `_useAbility()` branches to match real `char.id` values, add `ABILITIES.ice.freezeDuration`, add tiny near-center guard, fix GameScene init defaults, add pure-logic regression tests in `tests/abilities.test.js`
+- [ ] 08-02-PLAN.md — HUD redesign: remove `_buildAbilityBar`/`_drawAbilBar`, add `_buildAbilityHUD` + `_updateAbilityHUD` in UIScene placing emoji+countdown below the score bar with edge-triggered pulse tween and accentColor glow
