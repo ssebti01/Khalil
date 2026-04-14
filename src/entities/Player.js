@@ -41,6 +41,16 @@ export class Player {
     this.sprite.setFixedRotation();
     this.sprite.setDepth(20);
 
+    this.scene.matter.world.on('collisionstart', (event) => {
+      event.pairs.forEach(pair => {
+        const { bodyA, bodyB } = pair;
+        const bodies = [bodyA, bodyB];
+        const isSelf  = bodies.some(b => b === this.sprite.body);
+        const isBall  = bodies.some(b => b.label === 'ball');
+        if (isSelf && isBall) this._wobble();
+      });
+    });
+
     // Zero X velocity if window loses focus — prevents held-key drift on alt-tab
     // Only X is zeroed so mid-air jump arcs are not interrupted by focus changes
     this.scene.game.events.on('blur', () => {
@@ -60,7 +70,11 @@ export class Player {
   update(time, delta, ball) {
     if (time < this.frozenUntil) return;
 
+    const wasOnGround = this.isOnGround;
     this.checkGround();
+    if (!wasOnGround && this.isOnGround) {
+      this._wobble();
+    }
 
     const speed = PLAYER.runSpeed * this.char.stats.speed;
     const body = this.sprite.body;
@@ -111,6 +125,7 @@ export class Player {
   }
 
   _useAbility(time, ball) {
+    this._wobble();
     this.abilityCooldown = time + ABILITY_COOLDOWN;
     const id = this.char.id;
 
