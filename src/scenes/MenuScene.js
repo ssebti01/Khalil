@@ -13,6 +13,13 @@ export class MenuScene extends Phaser.Scene {
   }
 
   create() {
+    // Restore state across scene.restart() (e.g. after mode toggle)
+    const data = this.scene.settings.data || {};
+    if (data.p1CharIndex !== undefined) this.p1CharIndex = data.p1CharIndex;
+    if (data.p2CharIndex !== undefined) this.p2CharIndex = data.p2CharIndex;
+    if (data.vsMode      !== undefined) this.vsMode      = data.vsMode;
+    if (data.mapIndex    !== undefined) this.mapIndex    = data.mapIndex;
+
     this._drawBackground();
     this._drawTitle();
     this._drawModeToggle();
@@ -153,7 +160,7 @@ export class MenuScene extends Phaser.Scene {
   _drawMapSelector() {
     const maps = getMaps();
     const cx = GAME_WIDTH / 2;
-    const cy = 510;
+    const cy = 490;
 
     // Background strip
     const bg = this.add.graphics();
@@ -163,7 +170,7 @@ export class MenuScene extends Phaser.Scene {
     bg.strokeRoundedRect(cx - 200, cy - 28, 400, 56, 10);
 
     // Label above
-    this.add.text(cx, cy - 40, 'MAP', {
+    this.add.text(cx, cy - 42, 'MAP', {
       fontSize: '14px', fontFamily: 'Arial Black, sans-serif',
       color: '#888888',
     }).setOrigin(0.5);
@@ -198,8 +205,13 @@ export class MenuScene extends Phaser.Scene {
   }
 
   _updateCharLabels() {
-    // Redraw labels based on vsMode — rebuild scene is simplest
-    this.scene.restart();
+    // Redraw labels based on vsMode — rebuild scene, preserving selection state
+    this.scene.restart({
+      p1CharIndex: this.p1CharIndex,
+      p2CharIndex: this.p2CharIndex,
+      vsMode: this.vsMode,
+      mapIndex: this.mapIndex,
+    });
   }
 
   _changeChar(pIndex, dir) {
@@ -218,7 +230,7 @@ export class MenuScene extends Phaser.Scene {
   }
 
   _drawStartButton() {
-    const btn = this.add.text(GAME_WIDTH / 2, 570, 'KICK OFF!', {
+    const btn = this.add.text(GAME_WIDTH / 2, 590, 'KICK OFF!', {
       fontSize: '42px',
       fontFamily: 'Arial Black, sans-serif',
       color: '#ffffff',

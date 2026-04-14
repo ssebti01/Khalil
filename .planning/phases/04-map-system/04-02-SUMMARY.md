@@ -93,3 +93,10 @@ None - no external service configuration required.
 ---
 *Phase: 04-map-system*
 *Completed: 2026-04-14*
+
+## Self-Check: PASSED
+
+- FOUND: src/scenes/MenuScene.js
+- FOUND: .planning/phases/04-map-system/04-02-SUMMARY.md
+- FOUND commit ce3324c: feat(04-02): add map selector widget to MenuScene
+- FOUND commit 74c04a3: feat(04-02): pass mapId to GameScene on start
