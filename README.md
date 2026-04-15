@@ -20,6 +20,32 @@
 
 ---
 
+## Running the Game
+
+This repo contains **Head Soccer**, a web-based 2-player soccer game built with Phaser 3. Two players (or 1 player vs CPU) bounce a ball into each other's goal using character heads with unique abilities.
+
+```bash
+git clone https://github.com/ssebti01/Khalil.git
+cd Khalil
+npm install
+npm run dev
+```
+
+Open http://localhost:5173 in a browser.
+
+**Controls:**
+- **P1:** `A`/`D` move, `W` jump, `Q` ability
+- **P2 / CPU:** `←`/`→` move, `↑` jump, `SHIFT` ability
+
+**Other commands:**
+- `npm test` — run the Vitest suite (abilities, maps)
+- `npm run build` — production build to `dist/`
+- `npm run preview` — preview the production build
+
+Everything below this section describes the Claude Code Game Studios development scaffolding used to build the game. You don't need any of it to run or play.
+
+---
+
 ## Why This Exists
 
 Building a game solo with AI is powerful — but a single chat session has no structure. No one stops you from hardcoding magic numbers, skipping design docs, or writing spaghetti code. There's no QA pass, no design review, no one asking "does this actually fit the game's vision?"

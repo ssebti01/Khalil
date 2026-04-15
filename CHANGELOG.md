@@ -3,6 +3,31 @@
 All notable changes to Head Soccer are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.2.0.0] - 2026-04-15
+
+### Added
+- **Character-specific abilities** — each of the 5 characters now has a distinct
+  ability (Khalil: fire kick, Beboush: ice freeze, Lilya: thunder dash, Fafa:
+  ninja teleport, Sara: tiny ball-lift) with per-ability cooldowns and tuning
+  knobs centralized in `ABILITIES` config
+- **Top-center ability HUD** — replaces the legacy side ability bars with a
+  compact emoji + countdown cluster that pulses on cast, glows during cooldown,
+  and surfaces the remaining seconds for both players at a glance
+- **Chicago and Houston maps** with a wind system that drifts the ball
+  horizontally based on per-map wind vectors (`src/scenes/GameScene.js`)
+- **Ability unit tests** — 7 pure-logic tests covering per-character ability
+  dispatch, cooldown application, and `ABILITIES.ice` freeze behavior
+
+### Changed
+- `Player._useAbility` now branches on `character.id` instead of a shared
+  generic kick, enabling per-character logic cleanly
+- HUD layout: legacy per-side ability bars removed in favor of the unified
+  top-center cluster
+
+### Removed
+- `src/ai/CPUPlayer.js` — CPU behavior folded into in-scene logic driven by
+  `GameScene`, eliminating a redundant abstraction layer
+
 ## [0.1.1.0] - 2026-04-14
 
 ### Added
