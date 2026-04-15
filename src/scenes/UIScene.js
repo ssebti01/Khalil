@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, ABILITY_COOLDOWN } from '../config/constants.js';
+import { GAME_WIDTH, ABILITY_COOLDOWN, ABILITIES } from '../config/constants.js';
 
 export class UIScene extends Phaser.Scene {
   constructor() { super({ key: 'UIScene' }); }
@@ -39,17 +39,17 @@ export class UIScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // Ability HUD (top-center, below score bar)
-    this._buildAbilityHUD(0, GAME_WIDTH / 2 - 140); // P1 at x=500
-    this._buildAbilityHUD(1, GAME_WIDTH / 2 + 140); // P2 at x=780
+    this._buildAbilityHUD(0, GAME_WIDTH / 2 - 140, '[Q]');    // P1 keybind: Q
+    this._buildAbilityHUD(1, GAME_WIDTH / 2 + 140, '[SHIFT]'); // P2 keybind: SHIFT
   }
 
-  _buildAbilityHUD(playerIndex, centerX) {
+  _buildAbilityHUD(playerIndex, centerX, keybind) {
     const y = 97; // just below timer at y=80
 
     // Glow background (redrawn each frame; initially empty)
     const glowBg = this.add.graphics().setDepth(9);
 
-    // Emoji icon — fontFamily omitted so OS handles emoji rendering (RESEARCH Pitfall 3)
+    // Emoji icon — fontFamily omitted so OS handles emoji rendering
     const icon = this.add.text(centerX, y, '', {
       fontSize: '36px',
       fontFamily: 'Arial, sans-serif',
@@ -60,6 +60,13 @@ export class UIScene extends Phaser.Scene {
       fontSize: '16px',
       fontFamily: 'Arial Black, sans-serif',
       color: '#ffffff',
+    }).setOrigin(0.5).setDepth(10);
+
+    // Keybind label — always visible, dim below the HUD cluster
+    this.add.text(centerX, y + 44, keybind, {
+      fontSize: '11px',
+      fontFamily: 'Arial, sans-serif',
+      color: '#888888',
     }).setOrigin(0.5).setDepth(10);
 
     const store = {
@@ -92,21 +99,20 @@ export class UIScene extends Phaser.Scene {
     const now = this.scene.get('GameScene').time.now;
     const p1Ratio = gs.p1 ? gs.p1.getAbilityCooldownRatio(now) : 1;
     const p2Ratio = gs.p2 ? gs.p2.getAbilityCooldownRatio(now) : 1;
-    const p1Color = gs.p1 ? gs.p1.char.accentColor : 0x4488ff;
-    const p2Color = gs.p2 ? gs.p2.char.accentColor : 0xff4400;
 
-    // Keep p1Color/p2Color for potential future use; update HUDs if player exists
-    void p1Color; void p2Color;
-
-    if (this._p1AbilHud && gs.p1) this._updateAbilityHUD(this._p1AbilHud, p1Ratio, gs.p1.char);
-    if (this._p2AbilHud && gs.p2) this._updateAbilityHUD(this._p2AbilHud, p2Ratio, gs.p2.char);
+    if (this._p1AbilHud && gs.p1) this._updateAbilityHUD(this._p1AbilHud, p1Ratio, gs.p1);
+    if (this._p2AbilHud && gs.p2) this._updateAbilityHUD(this._p2AbilHud, p2Ratio, gs.p2);
   }
 
-  _updateAbilityHUD(hud, ratio, char) {
+  _updateAbilityHUD(hud, ratio, player) {
+    const char = player.char;
     const ready = ratio >= 1;
-    const secsRemaining = ready ? 0 : Math.ceil((1 - ratio) * ABILITY_COOLDOWN / 1000);
+    // Use per-ability cooldown for accurate countdown (fallback to global ABILITY_COOLDOWN)
+    const abilityKey = { khalil: 'fire', beboush: 'ice', lilya: 'thunder', fafa: 'ninja', sara: 'tiny' }[char.id];
+    const cd = (abilityKey && ABILITIES[abilityKey]?.cooldown) ?? ABILITY_COOLDOWN;
+    const secsRemaining = ready ? 0 : Math.ceil((1 - ratio) * cd / 1000);
 
-    // Lazy-init emoji on first frame where char is available (RESEARCH Pitfall 5)
+    // Lazy-init emoji on first frame where char is available
     if (hud.icon.text !== char.emoji) hud.icon.setText(char.emoji);
 
     // Countdown: show seconds if on cooldown, hide if ready (D-02)

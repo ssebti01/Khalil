@@ -5,11 +5,11 @@ export class BootScene extends Phaser.Scene {
 
   preload() {
     // Character head images
-    this.load.image('head_blaze',  './assets/images/head_blaze.png');
-    this.load.image('head_frost',  './assets/images/head_frost.png');
-    this.load.image('head_bolt',   './assets/images/head_bolt.png');
-    this.load.image('head_shadow', './assets/images/head_shadow.png');
-    this.load.image('head_tiny',   './assets/images/head_tiny.png');
+    this.load.image('head_khalil',  './images/heads/Gemini_Generated_Image_64vc0b64vc0b64vc.png');
+    this.load.image('head_beboush', './images/heads/Gemini_Generated_Image_adax3hadax3hadax.png');
+    this.load.image('head_lilya',   './images/heads/Gemini_Generated_Image_awr8l7awr8l7awr8.png');
+    this.load.image('head_fafa',    './images/heads/Gemini_Generated_Image_jldm69jldm69jldm.png');
+    this.load.image('head_sara',    './images/heads/Gemini_Generated_Image_v0pmspv0pmspv0pm.png');
   }
 
   create() {

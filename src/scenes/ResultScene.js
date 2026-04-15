@@ -10,7 +10,6 @@ export class ResultScene extends Phaser.Scene {
     this.winner = data.winner; // 0, 1, or -1 (draw)
     this.p1CharId = data.p1CharId;
     this.p2CharId = data.p2CharId;
-    this.vsMode = data.vsMode;
   }
 
   create() {
@@ -65,7 +64,6 @@ export class ResultScene extends Phaser.Scene {
       this.scene.start('GameScene', {
         p1CharId: this.p1CharId,
         p2CharId: this.p2CharId,
-        vsMode: this.vsMode,
       });
     });
 
@@ -84,7 +82,7 @@ export class ResultScene extends Phaser.Scene {
 
     this.input.keyboard.once('keydown-ENTER', () => {
       this.scene.start('GameScene', {
-        p1CharId: this.p1CharId, p2CharId: this.p2CharId, vsMode: this.vsMode,
+        p1CharId: this.p1CharId, p2CharId: this.p2CharId,
       });
     });
     this.input.keyboard.once('keydown-ESC', () => this.scene.start('MenuScene'));

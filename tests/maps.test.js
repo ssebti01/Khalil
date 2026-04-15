@@ -39,7 +39,7 @@ describe('maps config', () => {
     });
 
     it('has expected floor physics', () => {
-      expect(rabat.floorFriction).toBe(0.05);
+      expect(rabat.floorFriction).toBe(0.10);
       expect(rabat.floorRestitution).toBe(0.2);
     });
 
@@ -89,10 +89,10 @@ describe('maps config', () => {
       expect(bouskoura.specialZones).toEqual([]);
     });
 
-    it('fallen log has restitution 0.5 (bouncy)', () => {
+    it('fallen log has restitution 0.55 (bouncy)', () => {
       const log = bouskoura.obstacles.find(o => o.w === 180);
       expect(log).toBeDefined();
-      expect(log.restitution).toBe(0.5);
+      expect(log.restitution).toBe(0.55);
     });
 
     it('all obstacles have label "obstacle" and a visual object', () => {
@@ -167,11 +167,12 @@ describe('maps config', () => {
       });
     });
 
-    it('bumpers are circle type with high restitution', () => {
+    it('bumpers are circle type with moderate restitution', () => {
       const bumpers = shanghai.obstacles.filter(o => o.label.startsWith('bumper'));
       bumpers.forEach(b => {
         expect(b.type).toBe('circle');
-        expect(b.restitution).toBeGreaterThanOrEqual(0.7);
+        // was 0.7 — reduced to 0.5 to avoid accidental goal deflections
+        expect(b.restitution).toBeGreaterThanOrEqual(0.5);
       });
     });
   });
@@ -179,8 +180,8 @@ describe('maps config', () => {
   describe('NYC map', () => {
     const nyc = getMap('nyc');
 
-    it('has exactly 3 obstacles', () => {
-      expect(nyc.obstacles).toHaveLength(3);
+    it('has exactly 4 obstacles (symmetric pair of hydrants + pair of taxis)', () => {
+      expect(nyc.obstacles).toHaveLength(4);
     });
 
     it('has function-based background', () => {
@@ -194,7 +195,7 @@ describe('maps config', () => {
 
     it('subway grate trampoline has correct impulse and position', () => {
       const grate = nyc.specialZones[0];
-      expect(grate.impulseY).toBe(-18);
+      expect(grate.impulseY).toBe(-14);
       expect(grate.x).toBe(560);
       expect(grate.y).toBe(630);
       expect(grate.w).toBe(160);
@@ -209,24 +210,31 @@ describe('maps config', () => {
       expect(nyc.windForce).toBeNull();
     });
 
-    it('has hydrant, taxi, and lamppost obstacles', () => {
+    it('has mirrored hydrant and taxi obstacles (symmetric left/right pair)', () => {
       const labels = nyc.obstacles.map(o => o.label);
-      expect(labels).toContain('hydrant');
-      expect(labels).toContain('taxi');
-      expect(labels).toContain('lamppost');
+      expect(labels).toContain('hydrant_left');
+      expect(labels).toContain('hydrant_right');
+      expect(labels).toContain('taxi_left');
+      expect(labels).toContain('taxi_right');
     });
 
-    it('hydrant is a circle with restitution 0.6', () => {
-      const hydrant = nyc.obstacles.find(o => o.label === 'hydrant');
-      expect(hydrant.type).toBe('circle');
-      expect(hydrant.restitution).toBe(0.6);
+    it('hydrants are circles with restitution 0.6', () => {
+      const hydrants = nyc.obstacles.filter(o => o.label.startsWith('hydrant'));
+      expect(hydrants).toHaveLength(2);
+      hydrants.forEach(h => {
+        expect(h.type).toBe('circle');
+        expect(h.restitution).toBe(0.6);
+      });
     });
 
-    it('lamppost is a narrow tall box at center', () => {
-      const lamp = nyc.obstacles.find(o => o.label === 'lamppost');
-      expect(lamp.type).toBe('box');
-      expect(lamp.x).toBe(640);
-      expect(lamp.w).toBeLessThanOrEqual(10);
+    it('taxis are wide low boxes with moderate restitution', () => {
+      const taxis = nyc.obstacles.filter(o => o.label.startsWith('taxi'));
+      expect(taxis).toHaveLength(2);
+      taxis.forEach(t => {
+        expect(t.type).toBe('box');
+        expect(t.w).toBeGreaterThan(100);
+        expect(t.restitution).toBe(0.3);
+      });
     });
   });
 });

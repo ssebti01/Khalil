@@ -10,13 +10,14 @@ const tinyNearCenter = (ballX, ballY) =>
 const cooldownSeconds = (ratio) => Math.ceil((1 - ratio) * ABILITY_COOLDOWN / 1000);
 
 describe('ability logic', () => {
-  it('test_constants_ice_freeze_duration_equals_2000', () => {
-    expect(ABILITIES.ice.freezeDuration).toBe(2000);
+  it('test_constants_ice_freeze_duration_is_tuned_value', () => {
+    // 1200ms (down from 2000ms in early tuning) — long cooldown compensates
+    expect(ABILITIES.ice.freezeDuration).toBe(1200);
   });
 
   it('test_constants_fire_impulse_values_preserved', () => {
-    expect(ABILITIES.fire.impulseX).toBe(0.06);
-    expect(ABILITIES.fire.impulseY).toBe(-0.04);
+    expect(ABILITIES.fire.impulseX).toBe(0.35);
+    expect(ABILITIES.fire.impulseY).toBe(-0.25);
   });
 
   it('test_fire_direction_left_player_kicks_right', () => {

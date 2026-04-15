@@ -8,7 +8,6 @@ export class MenuScene extends Phaser.Scene {
     super({ key: 'MenuScene' });
     this.p1CharIndex = 0;
     this.p2CharIndex = 1;
-    this.vsMode = '2p'; // '2p' or 'cpu'
     this.mapIndex = 0;
   }
 
@@ -17,12 +16,10 @@ export class MenuScene extends Phaser.Scene {
     const data = this.scene.settings.data || {};
     if (data.p1CharIndex !== undefined) this.p1CharIndex = data.p1CharIndex;
     if (data.p2CharIndex !== undefined) this.p2CharIndex = data.p2CharIndex;
-    if (data.vsMode      !== undefined) this.vsMode      = data.vsMode;
     if (data.mapIndex    !== undefined) this.mapIndex    = data.mapIndex;
 
     this._drawBackground();
     this._drawTitle();
-    this._drawModeToggle();
     this._drawCharacterSelect();
     this._drawMapSelector();
     this._drawStartButton();
@@ -61,37 +58,11 @@ export class MenuScene extends Phaser.Scene {
     }).setOrigin(0.5);
   }
 
-  _drawModeToggle() {
-    const y = 155;
-    const tw = this.add.text(GAME_WIDTH / 2, y, '[ 2 PLAYER ]     VS CPU', {
-      fontSize: '22px',
-      fontFamily: 'Arial Black, sans-serif',
-      color: '#ffee00',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-
-    this._modeText = tw;
-    this._updateModeText();
-
-    tw.on('pointerdown', () => {
-      this.vsMode = this.vsMode === '2p' ? 'cpu' : '2p';
-      this._updateModeText();
-      this._updateCharLabels();
-    });
-  }
-
-  _updateModeText() {
-    if (this.vsMode === '2p') {
-      this._modeText.setText('[ 2 PLAYER ]     VS CPU');
-    } else {
-      this._modeText.setText('  2 PLAYER   [ VS CPU ]');
-    }
-  }
-
   _drawCharacterSelect() {
     this._charCards = [];
     const positions = [
-      { x: GAME_WIDTH * 0.25, label: 'PLAYER 1', side: 'left' },
-      { x: GAME_WIDTH * 0.75, label: 'PLAYER 2', side: 'right' },
+      { x: GAME_WIDTH * 0.3, label: 'PLAYER 1', side: 'left' },
+      { x: GAME_WIDTH * 0.7, label: 'PLAYER 2', side: 'right' },
     ];
 
     positions.forEach((pos, pIndex) => {
@@ -100,13 +71,13 @@ export class MenuScene extends Phaser.Scene {
       // Background card
       const bg = this.add.graphics();
       bg.fillStyle(0x000000, 0.4);
-      bg.fillRoundedRect(-110, -90, 220, 260, 16);
+      bg.fillRoundedRect(-140, -110, 280, 320, 16);
       bg.lineStyle(3, pIndex === 0 ? 0x4488ff : 0xff4400);
-      bg.strokeRoundedRect(-110, -90, 220, 260, 16);
+      bg.strokeRoundedRect(-140, -110, 280, 320, 16);
       card.add(bg);
 
       // Player label
-      const lbl = this.add.text(0, -70, pos.label, {
+      const lbl = this.add.text(0, -95, pos.label, {
         fontSize: '18px', fontFamily: 'Arial Black, sans-serif',
         color: pIndex === 0 ? '#4488ff' : '#ff4400',
       }).setOrigin(0.5);
@@ -114,27 +85,28 @@ export class MenuScene extends Phaser.Scene {
 
       // Character head image
       const charData = CHARACTERS[pIndex === 0 ? this.p1CharIndex : this.p2CharIndex];
-      const headImg = this.add.image(0, 10, charData.headImage).setDisplaySize(120, 120).setOrigin(0.5);
+      const headImg = this.add.image(0, 0, charData.headImage).setOrigin(0.5);
+      _setHeadSize(headImg, 200);
       // P2 card faces left (mirror)
       if (pIndex === 1) headImg.setFlipX(true);
       card.add(headImg);
 
       // Character name
-      const nameText = this.add.text(0, 75, charData.name, {
+      const nameText = this.add.text(0, 110, charData.name, {
         fontSize: '24px', fontFamily: 'Arial Black, sans-serif',
         color: `#${charData.color.toString(16).padStart(6, '0')}`,
       }).setOrigin(0.5);
       card.add(nameText);
 
       // Ability name
-      const abilText = this.add.text(0, 105, charData.ability.name, {
+      const abilText = this.add.text(0, 140, charData.ability.name, {
         fontSize: '14px', fontFamily: 'Arial, sans-serif',
         color: '#aaaaaa',
       }).setOrigin(0.5);
       card.add(abilText);
 
       // Arrow buttons
-      const leftBtn = this.add.text(-90, 10, '◄', {
+      const leftBtn = this.add.text(-120, 0, '◄', {
         fontSize: '28px', color: '#ffffff',
       }).setOrigin(0.5).setInteractive({ useHandCursor: true });
       leftBtn.on('pointerdown', () => this._changeChar(pIndex, -1));
@@ -142,7 +114,7 @@ export class MenuScene extends Phaser.Scene {
       leftBtn.on('pointerout', () => leftBtn.setColor('#ffffff'));
       card.add(leftBtn);
 
-      const rightBtn = this.add.text(90, 10, '►', {
+      const rightBtn = this.add.text(120, 0, '►', {
         fontSize: '28px', color: '#ffffff',
       }).setOrigin(0.5).setInteractive({ useHandCursor: true });
       rightBtn.on('pointerdown', () => this._changeChar(pIndex, 1));
@@ -152,9 +124,6 @@ export class MenuScene extends Phaser.Scene {
 
       this._charCards.push({ headImg, nameText, abilText, pIndex, pos });
     });
-
-    // P2 label reference for CPU mode toggle
-    this._p2Label = this._charCards[1].pos;
   }
 
   _drawMapSelector() {
@@ -177,7 +146,8 @@ export class MenuScene extends Phaser.Scene {
 
     // Map name text
     this._mapNameText = this.add.text(cx, cy, maps[this.mapIndex].name, {
-      fontSize: '26px', fontFamily: 'Arial Black, sans-serif',
+      fontSize: _mapFontSize(maps[this.mapIndex].name) + 'px',
+      fontFamily: 'Arial Black, sans-serif',
       color: '#ffffff',
     }).setOrigin(0.5);
 
@@ -188,6 +158,7 @@ export class MenuScene extends Phaser.Scene {
     leftArrow.on('pointerdown', () => {
       this.mapIndex = (this.mapIndex - 1 + maps.length) % maps.length;
       this._mapNameText.setText(maps[this.mapIndex].name);
+      this._mapNameText.setFontSize(_mapFontSize(maps[this.mapIndex].name));
     });
     leftArrow.on('pointerover', () => leftArrow.setColor('#ffee00'));
     leftArrow.on('pointerout', () => leftArrow.setColor('#ffffff'));
@@ -199,19 +170,10 @@ export class MenuScene extends Phaser.Scene {
     rightArrow.on('pointerdown', () => {
       this.mapIndex = (this.mapIndex + 1) % maps.length;
       this._mapNameText.setText(maps[this.mapIndex].name);
+      this._mapNameText.setFontSize(_mapFontSize(maps[this.mapIndex].name));
     });
     rightArrow.on('pointerover', () => rightArrow.setColor('#ffee00'));
     rightArrow.on('pointerout', () => rightArrow.setColor('#ffffff'));
-  }
-
-  _updateCharLabels() {
-    // Redraw labels based on vsMode — rebuild scene, preserving selection state
-    this.scene.restart({
-      p1CharIndex: this.p1CharIndex,
-      p2CharIndex: this.p2CharIndex,
-      vsMode: this.vsMode,
-      mapIndex: this.mapIndex,
-    });
   }
 
   _changeChar(pIndex, dir) {
@@ -224,6 +186,7 @@ export class MenuScene extends Phaser.Scene {
     const card = this._charCards[pIndex];
     const charData = CHARACTERS[pIndex === 0 ? this.p1CharIndex : this.p2CharIndex];
     card.headImg.setTexture(charData.headImage);
+    _setHeadSize(card.headImg, 200);
     card.nameText.setText(charData.name);
     card.nameText.setColor(`#${charData.color.toString(16).padStart(6, '0')}`);
     card.abilText.setText(charData.ability.name);
@@ -249,11 +212,27 @@ export class MenuScene extends Phaser.Scene {
   }
 
   _drawControls() {
-    this.add.text(GAME_WIDTH / 2, 650, 'P1: A/D + W (jump) + Q (ability)        P2: ←/→ + ↑ (jump) + SHIFT (ability)', {
-      fontSize: '13px',
-      fontFamily: 'Arial, sans-serif',
+    const y = 648;
+
+    // P1 controls — left column
+    this.add.text(GAME_WIDTH * 0.3, y - 10, 'PLAYER 1', {
+      fontSize: '13px', fontFamily: 'Arial Black, sans-serif',
+      color: '#4488ff',
+    }).setOrigin(0.5, 1);
+    this.add.text(GAME_WIDTH * 0.3, y + 4, 'A / D  —  Move    W  —  Jump    Q  —  Ability    E  —  Kick', {
+      fontSize: '13px', fontFamily: 'Arial, sans-serif',
       color: '#888888',
-    }).setOrigin(0.5);
+    }).setOrigin(0.5, 0);
+
+    // P2 controls — right column
+    this.add.text(GAME_WIDTH * 0.7, y - 10, 'PLAYER 2', {
+      fontSize: '13px', fontFamily: 'Arial Black, sans-serif',
+      color: '#ff4400',
+    }).setOrigin(0.5, 1);
+    this.add.text(GAME_WIDTH * 0.7, y + 4, '← / →  —  Move    ↑  —  Jump    SHIFT  —  Ability    L  —  Kick', {
+      fontSize: '13px', fontFamily: 'Arial, sans-serif',
+      color: '#888888',
+    }).setOrigin(0.5, 0);
   }
 
   _startGame() {
@@ -261,8 +240,19 @@ export class MenuScene extends Phaser.Scene {
     this.scene.start('GameScene', {
       p1CharId: CHARACTERS[this.p1CharIndex].id,
       p2CharId: CHARACTERS[this.p2CharIndex].id,
-      vsMode: this.vsMode,
       mapId: maps[this.mapIndex].id,
     });
   }
+}
+
+function _setHeadSize(img, targetH) {
+  const frame = img.frame;
+  const ratio = frame.realWidth / frame.realHeight;
+  img.setDisplaySize(Math.round(targetH * ratio), targetH);
+}
+
+function _mapFontSize(name) {
+  if (name.length <= 12) return 26;
+  if (name.length <= 18) return 20;
+  return 16;
 }

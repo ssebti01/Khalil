@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 import { Ball } from '../entities/Ball.js';
 import { Player } from '../entities/Player.js';
-import { CPUPlayer } from '../ai/CPUPlayer.js';
 import { getCharacter } from '../config/characters.js';
 import {
   GAME_WIDTH, GAME_HEIGHT, MATCH, PLAYER, GOAL, PHYSICS, ABILITIES,
@@ -17,7 +16,6 @@ export class GameScene extends Phaser.Scene {
   init(data) {
     this.p1CharId = data.p1CharId ?? 'khalil';
     this.p2CharId = data.p2CharId ?? 'beboush';
-    this.vsMode = data.vsMode ?? '2p';
     this.score = [0, 0];
     this.matchTime = MATCH.duration;
     this.goalCooldownUntil = 0;
@@ -43,14 +41,16 @@ export class GameScene extends Phaser.Scene {
       p1Right: Phaser.Input.Keyboard.KeyCodes.D,
       p1Up: Phaser.Input.Keyboard.KeyCodes.W,
       p1Ability: Phaser.Input.Keyboard.KeyCodes.Q,
+      p1Kick: Phaser.Input.Keyboard.KeyCodes.E,
       p2Left: Phaser.Input.Keyboard.KeyCodes.LEFT,
       p2Right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
       p2Up: Phaser.Input.Keyboard.KeyCodes.UP,
       p2Ability: Phaser.Input.Keyboard.KeyCodes.SHIFT,
+      p2Kick: Phaser.Input.Keyboard.KeyCodes.L,
     });
 
-    const p1Controls = { left: keys.p1Left, right: keys.p1Right, up: keys.p1Up, ability: keys.p1Ability };
-    const p2Controls = { left: keys.p2Left, right: keys.p2Right, up: keys.p2Up, ability: keys.p2Ability };
+    const p1Controls = { left: keys.p1Left, right: keys.p1Right, up: keys.p1Up, ability: keys.p1Ability, kick: keys.p1Kick };
+    const p2Controls = { left: keys.p2Left, right: keys.p2Right, up: keys.p2Up, ability: keys.p2Ability, kick: keys.p2Kick };
 
     this.escKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
     this.escKey.on('down', () => {
@@ -65,7 +65,6 @@ export class GameScene extends Phaser.Scene {
         this.scene.launch('PauseScene', {
           p1CharId: this.p1CharId,
           p2CharId: this.p2CharId,
-          vsMode: this.vsMode,
           mapId: this.mapId,
         });
       }
@@ -73,10 +72,6 @@ export class GameScene extends Phaser.Scene {
 
     this.p1 = new Player(this, GAME_WIDTH * 0.25, 'left', getCharacter(this.p1CharId), p1Controls);
     this.p2 = new Player(this, GAME_WIDTH * 0.75, 'right', getCharacter(this.p2CharId), p2Controls);
-
-    if (this.vsMode === 'cpu') {
-      this.cpu = new CPUPlayer(this.p2, 'left');
-    }
 
     // Ability cross-player events
     this.events.on('player-ability', ({ type, source }) => {
@@ -202,17 +197,18 @@ export class GameScene extends Phaser.Scene {
       winner,
       p1CharId: this.p1CharId,
       p2CharId: this.p2CharId,
-      vsMode: this.vsMode,
     });
   }
 
   _setupWind(mapConfig) {
     if (!mapConfig || !mapConfig.windForce) return;
     const wf = mapConfig.windForce;
+    this._windDirection = 1; // +1 or -1; flips each interval when wf.reverses is true
     this._windTimer = this.time.addEvent({
       delay: wf.intervalMs,
       loop: true,
       callback: () => {
+        if (wf.reverses) this._windDirection *= -1;
         this._windActive = true;
         this.time.delayedCall(500, () => {
           this._windActive = false;
@@ -221,28 +217,66 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  _resolvePush() {
+    const p1 = this.p1;
+    const p2 = this.p2;
+
+    const dist = Math.abs(p1.x - p2.x);
+    if (dist > PLAYER.pushContactDist) return; // not in contact
+
+    // Which direction is p1 relative to p2? p1 is left means pushDir = +1 (p1 pushes right into p2)
+    const pushDir = p1.x < p2.x ? 1 : -1;
+
+    const intent1 = p1.pushIntent; // positive = right, negative = left
+    const intent2 = p2.pushIntent;
+
+    // Is each player pushing INTO the other?
+    const p1Pushing = (intent1 * pushDir) > 0;  // p1 pushing toward p2
+    const p2Pushing = (intent2 * -pushDir) > 0; // p2 pushing toward p1
+
+    if (p1Pushing && p2Pushing) {
+      // Both pushing into each other — compute net
+      const net = intent1 + intent2; // opposing signs, so this is the difference
+      if (Math.abs(net) < PLAYER.pushLockThreshold) {
+        // Cancel — neither moves horizontally
+        p1._pushOverride = 0;
+        p2._pushOverride = 0;
+      } else {
+        // Stronger side wins — both move at net (prevents overlap, loser gets carried)
+        p1._pushOverride = net;
+        p2._pushOverride = net;
+      }
+    } else if (p1Pushing && !p2Pushing) {
+      // Only p1 pushes — p2 gets pushed, p1 moves normally
+      p2._pushOverride = intent1;
+    } else if (p2Pushing && !p1Pushing) {
+      // Only p2 pushes — p1 gets pushed, p2 moves normally
+      p1._pushOverride = intent2;
+    }
+    // Both idle or both moving away: no override needed
+  }
+
   update(time, delta) {
     if (this.matchOver) return;
     if (this.paused) return;
 
     // Wind force application (Chicago map mechanic)
+    // _windDirection alternates +1/-1 each interval when map has reverses:true
     if (this._windActive && this._currentMap?.windForce && this.ball?.body) {
       const wf = this._currentMap.windForce;
       Matter.Body.applyForce(
         this.ball.body,
         this.ball.body.position,
-        { x: wf.x * 0.0001, y: 0 }
+        { x: wf.x * 0.0001 * (this._windDirection ?? 1), y: 0 }
       );
     }
 
     this.ball.update(delta);
 
+    this._resolvePush();
+
     this.p1.update(time, delta, this.ball);
 
-    if (this.vsMode === 'cpu') {
-      this.cpu.update(time, delta, this.ball);
-    } else {
-      this.p2.update(time, delta, this.ball);
-    }
+    this.p2.update(time, delta, this.ball);
   }
 }

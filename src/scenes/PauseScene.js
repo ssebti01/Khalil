@@ -4,7 +4,7 @@ export class PauseScene extends Phaser.Scene {
   constructor() { super({ key: 'PauseScene' }); }
 
   init(data) {
-    this.initData = data; // { p1CharId, p2CharId, vsMode }
+    this.initData = data; // { p1CharId, p2CharId, mapId }
   }
 
   create() {

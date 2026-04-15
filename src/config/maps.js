@@ -25,7 +25,7 @@ export const MAPS = [
     id: 'rabat',
     name: 'Rabat',
     floorRestitution: 0.2,
-    floorFriction: 0.05,
+    floorFriction: 0.10,  // was 0.05 — raised for perceptible distinction from Bouskoura (0.01)
     background: {
       type: 'gradient',
       skyColors: [0x1a0a00, 0x3d1a00],
@@ -81,7 +81,7 @@ export const MAPS = [
         w: 140,
         h: 18,
         angle: -0.18,     // ~10 degrees, slopes upward toward center
-        restitution: 0.3,
+        restitution: 0.35, // was 0.3 — more energy returned to redirect ball toward center
         friction: 0.04,
         label: 'obstacle',
         visual: { color: 0x5a2808, alpha: 1 },
@@ -94,7 +94,7 @@ export const MAPS = [
         w: 140,
         h: 18,
         angle: 0.18,      // slopes upward toward center (mirrored)
-        restitution: 0.3,
+        restitution: 0.35, // was 0.3 — matches left ramp
         friction: 0.04,
         label: 'obstacle',
         visual: { color: 0x5a2808, alpha: 1 },
@@ -137,14 +137,14 @@ export const MAPS = [
       }
     },
     obstacles: [
-      // Left tree trunk pillar (playable obstacle, not purely decorative)
+      // Left tree trunk pillar — moved inward to enter play on corner shots
       {
         type: 'box',
-        x: 360,
-        y: 520,           // center y=520, h=80 → top=480, bottom=560 (80px above floor at y=640)
-        w: 28,
-        h: 80,
-        restitution: 0.3,
+        x: 300,           // was 360 — closer to goal, engages more during corner plays
+        y: 530,           // center y=530, h=60 → top=500, bottom=560 (80px above floor at y=640)
+        w: 40,
+        h: 60,
+        restitution: 0.45, // was 0.3 — crisper caroms on slippery surface = strategic billiard redirects
         friction: 0.05,
         label: 'obstacle',
         visual: { color: 0x3a1f08, alpha: 1 },
@@ -152,11 +152,11 @@ export const MAPS = [
       // Right tree trunk pillar — mirror
       {
         type: 'box',
-        x: 920,
-        y: 520,
-        w: 28,
-        h: 80,
-        restitution: 0.3,
+        x: 980,           // was 920 — symmetric inward shift
+        y: 530,
+        w: 40,
+        h: 60,
+        restitution: 0.45, // was 0.3 — matches left trunk
         friction: 0.05,
         label: 'obstacle',
         visual: { color: 0x3a1f08, alpha: 1 },
@@ -165,10 +165,10 @@ export const MAPS = [
       {
         type: 'box',
         x: 640,
-        y: 615,           // center y=615, h=30 → top=600, bottom=630 (10px above floor at y=640)
+        y: 610,           // was 615 — raised 5px so ball rolls onto it more naturally
         w: 180,
         h: 30,
-        restitution: 0.5, // bouncy
+        restitution: 0.55, // was 0.5 — slightly more pop on slippery floor = exciting mid-field redirect
         friction: 0.02,
         label: 'obstacle',
         visual: { color: 0x5c3317, alpha: 1 },
@@ -288,12 +288,12 @@ export const MAPS = [
         label: 'scaffold_right',
         visual: { color: 0x99cc22, alpha: 0 },
       },
-      // Left rooftop edge bumper — bouncy circle
+      // Left rooftop edge bumper — raised off floor so only aerial balls interact
       {
         type: 'circle',
-        x: 200, y: 600,
+        x: 220, y: 570,  // was x=200,y=600 — inset 20px, raised 30px off floor plane
         r: 20,
-        restitution: 0.7,
+        restitution: 0.50, // was 0.7 — reduces accidental goal deflections
         friction: 0.1,
         label: 'bumper_left',
         visual: { color: 0xcc4400, alpha: 0 },
@@ -301,9 +301,9 @@ export const MAPS = [
       // Right rooftop edge bumper — mirrored
       {
         type: 'circle',
-        x: 1080, y: 600,
+        x: 1060, y: 570, // was x=1080,y=600 — symmetric inset + raise
         r: 20,
-        restitution: 0.7,
+        restitution: 0.50, // was 0.7
         friction: 0.1,
         label: 'bumper_right',
         visual: { color: 0xcc4400, alpha: 0 },
@@ -317,7 +317,9 @@ export const MAPS = [
     name: 'Chicago \u2014 Lakefront Park',
     floorRestitution: 0.2,
     floorFriction: 0.3,
-    windForce: { x: 3, y: 0, intervalMs: 4000 },
+    // x=350 → adds ~1.3 px/frame per 500ms gust (was x=3 → 0.01 px/frame, imperceptible)
+    // reverses:true → direction alternates each interval, preventing permanent P1-goal bias
+    windForce: { x: 350, y: 0, intervalMs: 5000, reverses: true },
     background: (scene) => {
       const bg = scene.add.graphics();
 
@@ -414,36 +416,15 @@ export const MAPS = [
       // Park bench — wide low platform
       {
         type: 'box',
-        x: 640, y: 602,
+        x: 640, y: 598,  // was y=602 — raised 4px so ball rolls onto surface cleanly
         w: 220, h: 18,
         angle: 0,
-        restitution: 0.2,
+        restitution: 0.3, // was 0.2 — slight kick off bench rather than dead stop
         friction: 0.5,
         label: 'bench',
         visual: { color: 0x8b5e3c, alpha: 0 },
       },
-      // Left lamp post — thin tall static body
-      {
-        type: 'box',
-        x: 300, y: 555,
-        w: 8, h: 130,
-        angle: 0,
-        restitution: 0.2,
-        friction: 0.5,
-        label: 'lamppost_left',
-        visual: { color: 0x7a8899, alpha: 0 },
-      },
-      // Right lamp post — mirrored
-      {
-        type: 'box',
-        x: 980, y: 555,
-        w: 8, h: 130,
-        angle: 0,
-        restitution: 0.2,
-        friction: 0.5,
-        label: 'lamppost_right',
-        visual: { color: 0x7a8899, alpha: 0 },
-      },
+      // Lamp posts are purely decorative — no physics bodies to avoid invisible trapping
     ],
     specialZones: [],
   },
@@ -452,7 +433,7 @@ export const MAPS = [
   {
     id: 'houston',
     name: 'Houston \u2014 Rodeo Arena',
-    floorRestitution: 0.45,
+    floorRestitution: 0.32,  // was 0.45 — reduced 2.25× bounce to 1.6× vs standard; still distinctly bouncy
     floorFriction: 0.25,
     windForce: null,
     background: (scene) => {
@@ -545,12 +526,12 @@ export const MAPS = [
       bg.lineBetween(560, 620, 720, 575);
     },
     obstacles: [
-      // Barrel bumper left — very bouncy circle
+      // Barrel bumper left — bouncy circle (primary "wow" element)
       {
         type: 'circle',
         x: 420, y: 595,
         r: 22,
-        restitution: 0.8,
+        restitution: 0.70, // was 0.8 — reduced to prevent stacked chaos with bouncier floor
         friction: 0.1,
         label: 'barrel_left',
         visual: { color: 0x8b5e20, alpha: 0 },
@@ -560,18 +541,19 @@ export const MAPS = [
         type: 'circle',
         x: 860, y: 595,
         r: 22,
-        restitution: 0.8,
+        restitution: 0.70, // was 0.8
         friction: 0.1,
         label: 'barrel_right',
         visual: { color: 0x8b5e20, alpha: 0 },
       },
-      // Launch ramp — angled center box that redirects ball upward
-      // angle: 0.14 rad ≈ 8 degrees (Matter.js uses radians)
+      // Launch ramp — sits flush on the floor so ball can't wedge underneath
+      // center y = floor(640) - h/2(10) = 630; bottom edge = 640, top edge = 620
+      // Ball (r=20) rolls over the 20px-tall bump cleanly with no trapping gap
       {
         type: 'box',
-        x: 640, y: 598,
-        w: 160, h: 12,
-        angle: 0.14,
+        x: 640, y: 630,
+        w: 160, h: 20,
+        angle: 0,
         restitution: 0.4,
         friction: 0.2,
         label: 'ramp',
@@ -695,17 +677,29 @@ export const MAPS = [
       bg.lineBetween(560, 635, 720, 635);
     },
     obstacles: [
-      // Fire hydrant — bouncy circle deflector
+      // Fire hydrant left — bouncy circle deflector (P1 side)
       {
         type: 'circle',
         x: 400, y: 620,
         r: 18,
         restitution: 0.6,
         friction: 0.2,
-        label: 'hydrant',
+        label: 'hydrant_left',
         visual: { color: 0xcc1111, alpha: 0 },
       },
-      // Yellow taxi barrier — wide low box
+      // Yellow taxi barrier left — wide low box (was right-only, now mirrored for fairness)
+      // x=445 mirrors x=835: 1280-835=445
+      {
+        type: 'box',
+        x: 445, y: 600,
+        w: 170, h: 40,
+        angle: 0,
+        restitution: 0.3,
+        friction: 0.4,
+        label: 'taxi_left',
+        visual: { color: 0xffcc00, alpha: 0 },
+      },
+      // Yellow taxi barrier right — original position kept
       {
         type: 'box',
         x: 835, y: 600,
@@ -713,28 +707,29 @@ export const MAPS = [
         angle: 0,
         restitution: 0.3,
         friction: 0.4,
-        label: 'taxi',
+        label: 'taxi_right',
         visual: { color: 0xffcc00, alpha: 0 },
       },
-      // Street lamp post — thin tall box (dead center)
+      // Fire hydrant right — mirror of left (x=1280-400=880)
       {
-        type: 'box',
-        x: 640, y: 560,
-        w: 10, h: 160,
-        angle: 0,
-        restitution: 0.2,
-        friction: 0.5,
-        label: 'lamppost',
-        visual: { color: 0x888899, alpha: 0 },
+        type: 'circle',
+        x: 880, y: 620,
+        r: 18,
+        restitution: 0.6,
+        friction: 0.2,
+        label: 'hydrant_right',
+        visual: { color: 0xcc1111, alpha: 0 },
       },
+      // Street lamp post is purely decorative — no physics body to avoid invisible center trapping
     ],
     specialZones: [
-      // Subway grate trampoline — center pitch, impulse ball upward
+      // Subway grate trampoline — center pitch, launches ball upward
+      // impulseY=-14 (was -18): peak height 49px, still clears players, less deterministic
       {
         type: 'trampoline',
         x: 560, y: 630,
         w: 160, h: 10,
-        impulseY: -18,
+        impulseY: -14,
       },
     ],
   },
